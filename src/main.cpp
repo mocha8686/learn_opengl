@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cmath>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -8,14 +7,17 @@ const unsigned int INITIAL_SCREEN_HEIGHT = 600;
 
 const char *VERTEX_SHADER_SOURCE = "#version 330 core \
 	layout (location = 0) in vec3 aPos; \
+	layout (location = 1) in vec3 aCol; \
+	out vec3 color; \
 	void main() { \
 		gl_Position = vec4(aPos, 1.0); \
+		color = aCol; \
 	}";
 const char *FRAGMENT_SHADER_SOURCE = "#version 330 core \
+	in vec3 color; \
 	out vec4 FragColor; \
-	uniform vec4 color; \
 	void main() { \
-		FragColor = color; \
+		FragColor = vec4(color, 1.0); \
 	}";
 
 // Callbacks
@@ -121,9 +123,10 @@ int main() {
 	unsigned int shaderProgram = initializeShaderProgram();
 
 	const float VERTICES[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f,	
+		// position			// color
+		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+		 0.0f,  0.5f, 0.0f,	0.0f, 0.0f, 1.0f,
 	};
 
 	// Initialize, bind, and configure vertex buffer object and vertex array object
@@ -135,8 +138,12 @@ int main() {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
+	// Position
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
+	// Color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -148,11 +155,6 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shaderProgram);
-
-		float colorValue = (sin(glfwGetTime()) / 2.0f) + 0.5f;
-		int vertexColorLocation = glGetUniformLocation(shaderProgram, "color");
-		glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
-
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
