@@ -24,6 +24,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
+	} else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	} else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 }
 
@@ -149,9 +153,6 @@ int main() {
 	// Unbind VBO as it's referenced by the attribute buffer
 	// Keep the EBO bound as it's referenced by the VAO which is currently bound
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	// Wireframe mode
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
