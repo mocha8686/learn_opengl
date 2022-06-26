@@ -120,33 +120,21 @@ int main() {
 
 	unsigned int shaderProgram = initializeShaderProgram();
 
-	const float VERTICES_1[] = {
-		-0.4f, -0.5f, 0.0f,
-		-0.2f, -0.5f, 0.0f,
-		-0.3f, 0.5f, 0.0f,	
-	};
-	const float VERTICES_2[] = {
-		0.4f, -0.5f, 0.0f,
-		0.2f, -0.5f, 0.0f,
-		0.3f, 0.5f, 0.0f,	
+	const float VERTICES[] = {
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		0.0f, 0.5f, 0.0f,	
 	};
 
 	// Initialize, bind, and configure vertex buffer object and vertex array object
-	unsigned int VBOs[2], VAOs[2];
-	glGenVertexArrays(2, VAOs);
-	glGenBuffers(2, VBOs);
+	unsigned int VBO, VAO;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
 
-	// VAOs[0]
-	glBindVertexArray(VAOs[0]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES_1), VERTICES_1, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
-	glEnableVertexAttribArray(0);
-
-	// VAOs[1]
-	glBindVertexArray(VAOs[1]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES_2), VERTICES_2, GL_STATIC_DRAW);
+	// VAO/VBO
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*) 0);
 	glEnableVertexAttribArray(0);
 
@@ -165,9 +153,7 @@ int main() {
 		int vertexColorLocation = glGetUniformLocation(shaderProgram, "color");
 		glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
 
-		glBindVertexArray(VAOs[0]);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-		glBindVertexArray(VAOs[1]);
+		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		// Swap buffers and poll events
@@ -176,8 +162,8 @@ int main() {
 	}
 
 	// Deallocate resources after program lifetime
-	glDeleteVertexArrays(2, VAOs);
-	glDeleteBuffers(2, VBOs);
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
 	glDeleteProgram(shaderProgram);
 	glfwTerminate();
 }
