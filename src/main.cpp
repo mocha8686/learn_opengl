@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -12,8 +13,9 @@ const char *VERTEX_SHADER_SOURCE = "#version 330 core \
 	}";
 const char *FRAGMENT_SHADER_SOURCE = "#version 330 core \
 	out vec4 FragColor; \
+	uniform vec4 color; \
 	void main() { \
-		FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f); \
+		FragColor = color; \
 	}";
 
 // Callbacks
@@ -158,6 +160,11 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glUseProgram(shaderProgram);
+
+		float colorValue = (sin(glfwGetTime()) / 2.0f) + 0.5f;
+		int vertexColorLocation = glGetUniformLocation(shaderProgram, "color");
+		glUniform4f(vertexColorLocation, 0.0f, colorValue, 0.0f, 1.0f);
+
 		glBindVertexArray(VAOs[0]);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 		glBindVertexArray(VAOs[1]);
