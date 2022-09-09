@@ -21,11 +21,11 @@ const char *FRAGMENT_SHADER_SOURCE = "#version 330 core \
 	}";
 
 // Callbacks
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window) {
+void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	} else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
@@ -36,7 +36,7 @@ void processInput(GLFWwindow* window) {
 }
 
 // Helper functions
-GLFWwindow* initializeGLFW() {
+GLFWwindow *initializeGLFW() {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -45,7 +45,7 @@ GLFWwindow* initializeGLFW() {
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	#endif
 
-	GLFWwindow* window = glfwCreateWindow(INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT, "Learn OpenGL", NULL, NULL);
+	GLFWwindow *window = glfwCreateWindow(INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT, "Learn OpenGL", NULL, NULL);
 	if (window == NULL) {
 		glfwTerminate();
 		return NULL;
@@ -109,7 +109,7 @@ unsigned int initializeShaderProgram() {
 }
 
 int main() {
-	GLFWwindow* window = initializeGLFW();
+	GLFWwindow *window = initializeGLFW();
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window." << std::endl;
 		return 1;
@@ -123,7 +123,7 @@ int main() {
 	unsigned int shaderProgram = initializeShaderProgram();
 
 	const float VERTICES[] = {
-		// position			// color
+	//	position			color
 		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
 		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
 		 0.0f,  0.5f, 0.0f,	0.0f, 0.0f, 1.0f,
