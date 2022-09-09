@@ -56,34 +56,34 @@ GLFWwindow *initializeGLFW() {
 	return window;
 }
 
-unsigned int initializeShaderProgram() {
-	// Initialize vertex shader
-	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &VERTEX_SHADER_SOURCE, NULL);
-	glCompileShader(vertexShader);
+long initializeShader(unsigned int type, unsigned int count, const char *const *source) {
+	unsigned int id = glCreateShader(type);
+	glShaderSource(id, count, source, NULL);
+	glCompileShader(id);
 
-	// Check compilation status of vertex shader
 	int success;
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+	glGetShaderiv(id, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		char infoLog[512];
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "Vertex shader compilation failed:\n" << infoLog << std::endl;
-		return 0;
+		glGetShaderInfoLog(id, 512, NULL, infoLog);
+		std::cerr << "Shader compilation failed:\n" << infoLog << std::endl;
+		return -1;
+	}
+
+	return id;
+}
+
+long initializeShaderProgram() {
+	// Initialize vertex shader
+	long vertexShader = initializeShader(GL_VERTEX_SHADER, 1, &VERTEX_SHADER_SOURCE);
+	if (vertexShader == -1) {
+		return -1;
 	}
 
 	// Initialize fragment shader
-	unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &FRAGMENT_SHADER_SOURCE, NULL);
-	glCompileShader(fragmentShader);
-
-	// Check compilation status of fragment shader
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success) {
-		char infoLog[512];
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "Fragment shader compilation failed:\n" << infoLog << std::endl;
-		return 0;
+	long fragmentShader = initializeShader(GL_FRAGMENT_SHADER, 1, &FRAGMENT_SHADER_SOURCE);
+	if (fragmentShader == -1) {
+		return -1;
 	}
 
 	// Create shader program
@@ -93,6 +93,7 @@ unsigned int initializeShaderProgram() {
 	glLinkProgram(shaderProgram);
 
 	// Check link status of shader program
+	int success;
 	glGetShaderiv(shaderProgram, GL_LINK_STATUS, &success);
 	if (!success) {
 		char infoLog[512];
@@ -111,16 +112,20 @@ unsigned int initializeShaderProgram() {
 int main() {
 	GLFWwindow *window = initializeGLFW();
 	if (window == NULL) {
-		std::cout << "Failed to create GLFW window." << std::endl;
+		std::cerr << "Failed to create GLFW window." << std::endl;
 		return 1;
 	}
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-		std::cout << "Failed to initialize GLAD." << std::endl;
+		std::cerr << "Failed to initialize GLAD." << std::endl;
 		return 2;
 	}
 
-	unsigned int shaderProgram = initializeShaderProgram();
+	long shaderProgram = initializeShaderProgram();
+	if (shaderProgram == -1) {
+		std::cerr << "Failed to initialize shaders." << std::endl;
+		return 3;
+	}
 
 	const float VERTICES[] = {
 	//	position			color
