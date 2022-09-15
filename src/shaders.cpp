@@ -57,7 +57,7 @@ bool initializeShaderProgram(GLuint &id) {
 	glGetProgramiv(id, GL_LINK_STATUS, &success);
 	if (!success) {
 		char infoLog[512];
-		glGetShaderInfoLog(id, 512, nullptr, infoLog);
+		glGetProgramInfoLog(id, 512, nullptr, infoLog);
 		std::cout << "Shader program linking failed:\n" << infoLog << std::endl;
 		return false;
 	}
