@@ -56,8 +56,8 @@ GLFWwindow *initializeGLFW() {
 	return window;
 }
 
-long initializeShader(unsigned int type, unsigned int count, const char *const *source) {
-	unsigned int id = glCreateShader(type);
+bool initializeShader(GLuint type, GLsizei count, const GLchar *const *source, unsigned int &id) {
+	id = glCreateShader(type);
 	glShaderSource(id, count, source, NULL);
 	glCompileShader(id);
 
@@ -67,46 +67,46 @@ long initializeShader(unsigned int type, unsigned int count, const char *const *
 		char infoLog[512];
 		glGetShaderInfoLog(id, 512, NULL, infoLog);
 		std::cerr << "Shader compilation failed:\n" << infoLog << std::endl;
-		return -1;
+		return false;
 	}
 
-	return id;
+	return true;
 }
 
-long initializeShaderProgram() {
+bool initializeShaderProgram(GLuint &id) {
 	// Initialize vertex shader
-	long vertexShader = initializeShader(GL_VERTEX_SHADER, 1, &VERTEX_SHADER_SOURCE);
-	if (vertexShader == -1) {
-		return -1;
+	GLuint vertexShader;
+	if (!initializeShader(GL_VERTEX_SHADER, 1, &VERTEX_SHADER_SOURCE, vertexShader)) {
+		return false;
 	}
 
 	// Initialize fragment shader
-	long fragmentShader = initializeShader(GL_FRAGMENT_SHADER, 1, &FRAGMENT_SHADER_SOURCE);
-	if (fragmentShader == -1) {
-		return -1;
+	GLuint fragmentShader;
+	if (!initializeShader(GL_FRAGMENT_SHADER, 1, &FRAGMENT_SHADER_SOURCE, fragmentShader)) {
+		return false;
 	}
 
 	// Create shader program
-	unsigned int shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
+	id = glCreateProgram();
+	glAttachShader(id, vertexShader);
+	glAttachShader(id, fragmentShader);
+	glLinkProgram(id);
 
 	// Check link status of shader program
-	int success;
-	glGetShaderiv(shaderProgram, GL_LINK_STATUS, &success);
+	GLint success;
+	glGetProgramiv(id, GL_LINK_STATUS, &success);
 	if (!success) {
 		char infoLog[512];
-		glGetShaderInfoLog(shaderProgram, 512, NULL, infoLog);
+		glGetShaderInfoLog(id, 512, NULL, infoLog);
 		std::cout << "Shader program linking failed:\n" << infoLog << std::endl;
-		return 0;
+		return false;
 	}
 
 	// Use program and free shaders
-	glUseProgram(shaderProgram);
+	glUseProgram(id);
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-	return shaderProgram;
+	return true;
 }
 
 int main() {
@@ -121,21 +121,21 @@ int main() {
 		return 2;
 	}
 
-	long shaderProgram = initializeShaderProgram();
-	if (shaderProgram == -1) {
+	GLuint shaderProgram;
+	if (!initializeShaderProgram(shaderProgram)) {
 		std::cerr << "Failed to initialize shaders." << std::endl;
 		return 3;
 	}
 
 	const float VERTICES[] = {
-	//	position			color
+		// position			color
 		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
 		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
 		 0.0f,  0.5f, 0.0f,	0.0f, 0.0f, 1.0f,
 	};
 
 	// Initialize, bind, and configure vertex buffer object and vertex array object
-	unsigned int VBO, VAO;
+	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 
