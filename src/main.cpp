@@ -45,10 +45,10 @@ GLFWwindow *initializeGLFW() {
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	#endif
 
-	GLFWwindow *window = glfwCreateWindow(INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT, "Learn OpenGL", NULL, NULL);
-	if (window == NULL) {
+	GLFWwindow *window = glfwCreateWindow(INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT, "Learn OpenGL", nullptr, nullptr);
+	if (window == nullptr) {
 		glfwTerminate();
-		return NULL;
+		return nullptr;
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -58,14 +58,14 @@ GLFWwindow *initializeGLFW() {
 
 bool initializeShader(GLuint type, GLsizei count, const GLchar *const *source, unsigned int &id) {
 	id = glCreateShader(type);
-	glShaderSource(id, count, source, NULL);
+	glShaderSource(id, count, source, nullptr);
 	glCompileShader(id);
 
 	int success;
 	glGetShaderiv(id, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		char infoLog[512];
-		glGetShaderInfoLog(id, 512, NULL, infoLog);
+		glGetShaderInfoLog(id, 512, nullptr, infoLog);
 		std::cerr << "Shader compilation failed:\n" << infoLog << std::endl;
 		return false;
 	}
@@ -97,7 +97,7 @@ bool initializeShaderProgram(GLuint &id) {
 	glGetProgramiv(id, GL_LINK_STATUS, &success);
 	if (!success) {
 		char infoLog[512];
-		glGetShaderInfoLog(id, 512, NULL, infoLog);
+		glGetShaderInfoLog(id, 512, nullptr, infoLog);
 		std::cout << "Shader program linking failed:\n" << infoLog << std::endl;
 		return false;
 	}
@@ -111,7 +111,7 @@ bool initializeShaderProgram(GLuint &id) {
 
 int main() {
 	GLFWwindow *window = initializeGLFW();
-	if (window == NULL) {
+	if (window == nullptr) {
 		std::cerr << "Failed to create GLFW window." << std::endl;
 		return 1;
 	}
