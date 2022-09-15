@@ -113,18 +113,18 @@ int main() {
 	GLFWwindow *window = initializeGLFW();
 	if (window == nullptr) {
 		std::cerr << "Failed to create GLFW window." << std::endl;
-		return 1;
+		return -1;
 	}
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cerr << "Failed to initialize GLAD." << std::endl;
-		return 2;
+		return -1;
 	}
 
 	GLuint shaderProgram;
 	if (!initializeShaderProgram(shaderProgram)) {
 		std::cerr << "Failed to initialize shaders." << std::endl;
-		return 3;
+		return -1;
 	}
 
 	const float VERTICES[] = {
