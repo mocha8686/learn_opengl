@@ -20,7 +20,7 @@ set_target_properties(glad PROPERTIES
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/glad
 )
 
-add_executable(main ${CMAKE_SOURCE_DIR}/src/main.cpp)
+add_executable(main ${CMAKE_SOURCE_DIR}/src/main.cpp ${CMAKE_SOURCE_DIR}/src/shaders.cpp)
 target_link_libraries(main ${OPENGL_LIBRARIES} glfw glad)
 if(APPLE)
 	target_link_libraries(main
