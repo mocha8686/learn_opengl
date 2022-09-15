@@ -62,8 +62,7 @@ bool initializeShaderProgram(GLuint &id) {
 		return false;
 	}
 
-	// Use program and free shaders
-	glUseProgram(id);
+	// Free shaders
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 	return true;

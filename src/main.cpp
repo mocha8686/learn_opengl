@@ -59,6 +59,7 @@ int main() {
 		std::cerr << "Failed to initialize shaders." << std::endl;
 		return -1;
 	}
+	glUseProgram(shaderProgram);
 
 	const GLfloat VERTICES[] = {
 		// position         color             alpha
