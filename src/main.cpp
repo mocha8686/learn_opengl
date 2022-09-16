@@ -57,12 +57,7 @@ int main() {
 		return -1;
 	}
 
-	GLuint shaderProgram;
-	if (!initializeShaderProgram(shaderProgram)) {
-		std::cerr << "Failed to initialize shaders." << std::endl;
-		return -1;
-	}
-	glUseProgram(shaderProgram);
+	ShaderProgram program("res/basicVertex.glsl", "res/basicFragment.glsl");
 
 	const GLfloat VERTICES[] = {
 		// position         color
@@ -86,29 +81,19 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 0);
 	glEnableVertexAttribArray(0);
 	// Color
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, stride, (GLvoid*) (3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) (3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
-
-	// Get location of uniform color
-	GLint colorLocation = glGetUniformLocation(shaderProgram, "color");
 
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
 		// Input
 		processInput(window);
 
-		// Change color
-		float time = glfwGetTime();
-		float red = (sin(time) / 2.0f) + 0.5f;
-		float green = (sin(time + M_PI_2) / 2.0f) + 0.5f;
-		float blue = (sin(time + M_PI) / 2.0f) + 0.5f;
-		glUniform4f(colorLocation, red, green, blue, 1.0f);
-
 		// Render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glUseProgram(shaderProgram);
+		program.use();
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -120,6 +105,5 @@ int main() {
 	// Deallocate resources after program lifetime
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	glDeleteProgram(shaderProgram);
 	glfwTerminate();
 }
