@@ -6,14 +6,17 @@
 
 const char *VERTEX_SHADER_SOURCE = "#version 330 core \
 	layout (location = 0) in vec3 aPos; \
+	layout (location = 1) in vec3 aCol; \
+	out vec3 color; \
 	void main() { \
+	 	color = aCol; \
 		gl_Position = vec4(aPos, 1.0); \
 	}";
 const char *FRAGMENT_SHADER_SOURCE = "#version 330 core \
-	uniform vec4 color; \
+	in vec3 color; \
 	out vec4 FragColor; \
 	void main() { \
-		FragColor = color; \
+		FragColor = vec4(color, 1.0); \
 	}";
 
 bool initializeShader(GLuint type, GLsizei count, const GLchar *const *source, unsigned int &id) {
