@@ -1,4 +1,6 @@
 #include <iostream>
+#include <cmath>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "shaders.hpp"
@@ -62,10 +64,10 @@ int main() {
 	glUseProgram(shaderProgram);
 
 	const GLfloat VERTICES[] = {
-		// position         color             alpha
-		-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-		 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f,
-		 0.0f,  0.5f, 0.0f,	0.0f, 0.0f, 1.0f, 0.7f,
+		// position
+		-0.5f, -0.5f, 0.0f,
+		 0.5f, -0.5f, 0.0f,
+		 0.0f,  0.5f, 0.0f,
 	};
 
 	// Initialize, bind, and configure vertex buffer object and vertex array object
@@ -78,18 +80,29 @@ int main() {
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
 
-	GLint stride = 7 * sizeof(GLfloat);
+	// GLint stride = 3 * sizeof(GLfloat);
+	GLint stride = 0;
 	// Position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 0);
 	glEnableVertexAttribArray(0);
 	// Color
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, stride, (GLvoid*) (3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
+	// glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, stride, (GLvoid*) (3 * sizeof(GLfloat)));
+	// glEnableVertexAttribArray(1);
+
+	// Get location of uniform color
+	GLint colorLocation = glGetUniformLocation(shaderProgram, "color");
 
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
 		// Input
 		processInput(window);
+
+		// Change color
+		float time = glfwGetTime();
+		float red = (sin(time) / 2.0f) + 0.5f;
+		float green = (sin(time + M_PI_2) / 2.0f) + 0.5f;
+		float blue = (sin(time + M_PI) / 2.0f) + 0.5f;
+		glUniform4f(colorLocation, red, green, blue, 1.0f);
 
 		// Render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
