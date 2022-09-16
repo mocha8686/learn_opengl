@@ -1,5 +1,8 @@
-#include <iostream>
+#include "shaders.hpp"
+
 #include <glad/glad.h>
+
+#include <iostream>
 
 const char *VERTEX_SHADER_SOURCE = "#version 330 core \
 	layout (location = 0) in vec3 aPos; \

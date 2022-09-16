@@ -1,9 +1,10 @@
-#include <iostream>
-#include <cmath>
+#include "shaders.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "shaders.hpp"
+
+#include <iostream>
+#include <cmath>
 
 const unsigned int INITIAL_SCREEN_WIDTH = 800;
 const unsigned int INITIAL_SCREEN_HEIGHT = 600;
