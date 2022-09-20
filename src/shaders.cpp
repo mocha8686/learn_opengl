@@ -68,7 +68,7 @@ ShaderProgram::ShaderProgram(const std::string &vertexSourcePath, const std::str
 	Shader vertexShader(GL_VERTEX_SHADER, vertexSourcePath);
 	Shader fragmentShader(GL_FRAGMENT_SHADER, fragmentSourcePath);
 
-	auto id = glCreateProgram();
+	id = glCreateProgram();
 	vertexShader.attach(id);
 	fragmentShader.attach(id);
 	glLinkProgram(id);

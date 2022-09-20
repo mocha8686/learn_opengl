@@ -12,5 +12,5 @@ class ShaderProgram {
 	public:
 		ShaderProgram(const std::string &vertexSourcePath, const std::string &fragmentSourcePath);
 		~ShaderProgram() { glDeleteProgram(id); };
-		inline void use() { glUseProgram(id); };
+		void use() { glUseProgram(id); };
 };
