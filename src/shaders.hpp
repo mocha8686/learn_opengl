@@ -13,4 +13,5 @@ class ShaderProgram {
 		ShaderProgram(const std::string &vertexSourcePath, const std::string &fragmentSourcePath);
 		~ShaderProgram() { glDeleteProgram(id); };
 		void use() { glUseProgram(id); };
+		GLuint getId() { return id; };
 };
