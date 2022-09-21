@@ -22,8 +22,13 @@ set_target_properties(glad PROPERTIES
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/glad
 )
 
+add_library(stb_image STATIC ${CMAKE_SOURCE_DIR}/lib/stb_image.cpp)
+set_target_properties(stb_image PROPERTIES
+	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/stb_image
+)
+
 add_executable(main ${CMAKE_SOURCE_DIR}/src/main.cpp ${CMAKE_SOURCE_DIR}/src/shaders.cpp)
-target_link_libraries(main ${OPENGL_LIBRARIES} glfw glad)
+target_link_libraries(main ${OPENGL_LIBRARIES} glfw glad stb_image)
 if(APPLE)
 	target_link_libraries(main
 		"-framework Cocoa"
