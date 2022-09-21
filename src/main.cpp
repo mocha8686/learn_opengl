@@ -20,13 +20,17 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
-	} else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	} else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+	}
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	} else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
 		mixPercent = std::min(mixPercent + 0.01f, 1.0f);
-	} else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
 		mixPercent = std::max(mixPercent - 0.01f, 0.0f);
 	}
 }
