@@ -10,6 +10,8 @@
 const unsigned int INITIAL_SCREEN_WIDTH = 800;
 const unsigned int INITIAL_SCREEN_HEIGHT = 600;
 
+float mixPercent = 0.5f;
+
 // Callbacks
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 	glViewport(0, 0, width, height);
@@ -22,6 +24,10 @@ void processInput(GLFWwindow *window) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	} else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	} else if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		mixPercent = std::min(mixPercent + 0.01f, 1.0f);
+	} else if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		mixPercent = std::max(mixPercent - 0.01f, 0.0f);
 	}
 }
 
@@ -154,6 +160,7 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, texture1);
 
 		program.use();
+		glUniform1f(glGetUniformLocation(program.getId(), "mixPercent"), mixPercent);
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
