@@ -27,7 +27,7 @@ set_target_properties(stb_image PROPERTIES
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/stb_image
 )
 
-add_executable(main ${CMAKE_SOURCE_DIR}/src/main.cpp ${CMAKE_SOURCE_DIR}/src/shaders.cpp)
+add_executable(main ${CMAKE_SOURCE_DIR}/src/main.cpp ${CMAKE_SOURCE_DIR}/src/shader.cpp)
 target_link_libraries(main ${OPENGL_LIBRARIES} glfw glad stb_image)
 if(APPLE)
 	target_link_libraries(main
