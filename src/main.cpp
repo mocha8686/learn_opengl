@@ -3,6 +3,9 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 #include <string>
@@ -131,6 +134,13 @@ int main() {
 
 		program.use();
 		glUniform1f(glGetUniformLocation(program.getId(), "mixPercent"), mixPercent);
+
+		glm::mat4 trans(1.0f);
+		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+		trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+		program.use();
+		glUniformMatrix4fv(glGetUniformLocation(program.getId(), "trans"), 1, GL_FALSE, glm::value_ptr(trans));
+
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
