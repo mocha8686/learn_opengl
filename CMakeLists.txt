@@ -11,7 +11,7 @@ find_package(OpenGL REQUIRED)
 include_directories(${CMAKE_SOURCE_DIR}/include ${OPENGL_INCLUDE_DIR})
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
-add_library(glfw STATIC IMPORTED)
+add_library(glfw SHARED IMPORTED)
 set_target_properties(glfw PROPERTIES
 	IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/libglfw3.a
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/GLFW
@@ -22,13 +22,27 @@ set_target_properties(glad PROPERTIES
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/glad
 )
 
-add_library(stb_image STATIC ${CMAKE_SOURCE_DIR}/lib/stb_image.cpp)
+add_library(stb_image SHARED ${CMAKE_SOURCE_DIR}/lib/stb_image.cpp)
 set_target_properties(stb_image PROPERTIES
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/stb_image
 )
 
-add_executable(main ${CMAKE_SOURCE_DIR}/src/main.cpp ${CMAKE_SOURCE_DIR}/src/shader.cpp)
-target_link_libraries(main ${OPENGL_LIBRARIES} glfw glad stb_image)
+add_library(glm INTERFACE)
+set_target_properties(glm PROPERTIES
+	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/glm
+)
+
+add_executable(main
+	${CMAKE_SOURCE_DIR}/src/main.cpp
+	${CMAKE_SOURCE_DIR}/src/shader.cpp
+	${CMAKE_SOURCE_DIR}/src/texture.cpp
+)
+target_link_libraries(main ${OPENGL_LIBRARIES}
+	glad
+	glfw
+	glm
+	stb_image
+)
 if(APPLE)
 	target_link_libraries(main
 		"-framework Cocoa"
