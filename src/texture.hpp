@@ -13,7 +13,7 @@ class Texture {
 		Texture(const std::string &imagePath, GLint format);
 		Texture(const std::string &imagePath, GLint wrapS, GLint wrapT, GLint minFilter, GLint magFilter, GLint format);
 
-		void use(GLenum texture) {
+		void use(GLenum texture) const {
 			glActiveTexture(texture);
 			glBindTexture(GL_TEXTURE_2D, id);
 		};
