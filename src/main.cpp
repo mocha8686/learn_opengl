@@ -118,6 +118,15 @@ int main() {
 	program.uniformInt("tex0", 0);
 	program.uniformInt("tex1", 1);
 
+	// Model
+	glm::mat4 model(1.0f);
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+	glm::mat4 view(1.0f);
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+	glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) INITIAL_SCREEN_WIDTH / (float) INITIAL_SCREEN_HEIGHT, 0.1f, 100.0f);
+
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
 		// Input
@@ -129,23 +138,11 @@ int main() {
 
 		tex0.use(GL_TEXTURE0);
 		tex1.use(GL_TEXTURE1);
-
 		program.uniformFloat("mixPercent", mixPercent);
 
-		glm::mat4 trans1(1.0f);
-		trans1 = glm::translate(trans1, glm::vec3(0.5f, -0.5f, 0.0f));
-		trans1 = glm::rotate(trans1, static_cast<float>(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
-		program.uniformMat4("trans", trans1);
-
-		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-
-		glm::mat4 trans2(1.0f);
-		trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
-		float scale = static_cast<float>(sin(glfwGetTime()));
-		trans2 = glm::scale(trans2, glm::vec3(scale));
-		program.uniformMat4("trans", trans2);
+		program.uniformMat4("model", model);
+		program.uniformMat4("view", view);
+		program.uniformMat4("projection", projection);
 
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
