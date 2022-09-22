@@ -5,7 +5,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 #include <string>
@@ -116,9 +115,8 @@ int main() {
 	 	tex0("res/container.jpg", GL_RGB),
 		tex1("res/awesomeface.png", GL_RGBA);
 
-	program.use();
-	glUniform1i(glGetUniformLocation(program.getId(), "tex0"), 0);
-	glUniform1i(glGetUniformLocation(program.getId(), "tex1"), 1);
+	program.uniformInt("tex0", 0);
+	program.uniformInt("tex1", 1);
 
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -132,14 +130,12 @@ int main() {
 		tex0.use(GL_TEXTURE0);
 		tex1.use(GL_TEXTURE1);
 
-		program.use();
-		glUniform1f(glGetUniformLocation(program.getId(), "mixPercent"), mixPercent);
+		program.uniformFloat("mixPercent", mixPercent);
 
 		glm::mat4 trans(1.0f);
 		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 		trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-		program.use();
-		glUniformMatrix4fv(glGetUniformLocation(program.getId(), "trans"), 1, GL_FALSE, glm::value_ptr(trans));
+		program.uniformMat4("trans", trans);
 
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
