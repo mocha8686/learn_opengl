@@ -132,10 +132,20 @@ int main() {
 
 		program.uniformFloat("mixPercent", mixPercent);
 
-		glm::mat4 trans(1.0f);
-		trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-		trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
-		program.uniformMat4("trans", trans);
+		glm::mat4 trans1(1.0f);
+		trans1 = glm::translate(trans1, glm::vec3(0.5f, -0.5f, 0.0f));
+		trans1 = glm::rotate(trans1, static_cast<float>(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
+		program.uniformMat4("trans", trans1);
+
+		glBindVertexArray(VAO);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+
+		glm::mat4 trans2(1.0f);
+		trans2 = glm::translate(trans2, glm::vec3(-0.5f, 0.5f, 0.0f));
+		float scale = static_cast<float>(sin(glfwGetTime()));
+		trans2 = glm::scale(trans2, glm::vec3(scale));
+		program.uniformMat4("trans", trans2);
 
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
