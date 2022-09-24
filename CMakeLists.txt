@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 include(CTest)
 enable_testing()
 
+find_program(iwyu_path NAMES include-what-you-use iwyu REQUIRED)
 find_package(OpenGL REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${OPENGL_INCLUDE_DIR})
@@ -51,6 +52,7 @@ if(APPLE)
 		"-framework CoreVideo"
 	)
 endif()
+set_property(TARGET main PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
