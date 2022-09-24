@@ -6,35 +6,79 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <string>
 
 const unsigned int INITIAL_SCREEN_WIDTH = 800;
 const unsigned int INITIAL_SCREEN_HEIGHT = 600;
+const float MIX_SPEED = 1.0f;
+const float CAMERA_SPEED = 1.0f;
+const float MOUSE_SENSITIVITY = 1.0f;
+
+float delta = 0.0f, last = 0.0f;
 
 float mixPercent = 0.5f;
+
+glm::vec3 cameraPos(0.0f, 0.0f, 0.3f);
+glm::vec3 cameraFront(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
+
+bool firstMouse = true;
+float mouseLastX = INITIAL_SCREEN_WIDTH / 2, mouseLastY = INITIAL_SCREEN_HEIGHT / 2;
+float pitch = 0.0f, yaw = -90.0f;
 
 // Callbacks
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
+void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
+	if (firstMouse) {
+		mouseLastX = xPos;
+		mouseLastY = yPos;
+		firstMouse = false;
+	}
+
+	float xOffset = xPos - mouseLastX;
+	float yOffset = mouseLastY - yPos;
+	mouseLastX = xPos;
+	mouseLastY = yPos;
+
+	xOffset *= MOUSE_SENSITIVITY * delta;
+	yOffset *= MOUSE_SENSITIVITY * delta;
+
+	yaw += xOffset;
+	pitch = std::clamp(pitch + yOffset, -89.0f, 89.0f);
+
+	glm::vec3 direction(
+		cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
+		sin(glm::radians(pitch)),
+		sin(glm::radians(yaw)) * cos(glm::radians(pitch))
+	);
+	cameraFront = glm::normalize(direction);
+}
+
 void processInput(GLFWwindow *window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
-		mixPercent = std::min(mixPercent + 0.01f, 1.0f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		mixPercent = std::max(mixPercent - 0.01f, 0.0f);
-	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+		mixPercent = std::min(mixPercent + (MIX_SPEED * delta), 1.0f);
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+		mixPercent = std::max(mixPercent - (MIX_SPEED * delta), 0.0f);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraFront * CAMERA_SPEED * delta;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraFront * CAMERA_SPEED * delta;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * CAMERA_SPEED * delta;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * CAMERA_SPEED * delta;
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		cameraPos += cameraUp * CAMERA_SPEED * delta;
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		cameraPos -= cameraUp * CAMERA_SPEED * delta;
 }
 
 // Helper functions
@@ -54,6 +98,9 @@ GLFWwindow *initializeGLFW() {
 	}
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPosCallback(window, mouse_callback);
 
 	return window;
 }
@@ -159,6 +206,10 @@ int main() {
 
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
+		float now = glfwGetTime();
+		delta = now - last;
+		last = now;
+
 		// Input
 		processInput(window);
 
@@ -174,13 +225,10 @@ int main() {
 		glBindVertexArray(VAO);
 
 		// Matrices
-		const float RADIUS = 10.0f;
-		float camX = sin(glfwGetTime()) * RADIUS;
-		float camZ = cos(glfwGetTime()) * RADIUS;
 		glm::mat4 view = glm::lookAt(
-			glm::vec3(camX, 0.0f, camZ),
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f)
+			cameraPos,
+			cameraPos + cameraFront,
+			cameraUp
 		);
 
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) INITIAL_SCREEN_WIDTH / (float) INITIAL_SCREEN_HEIGHT, 0.1f, 100.0f);
