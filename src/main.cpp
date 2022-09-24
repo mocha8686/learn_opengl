@@ -174,8 +174,14 @@ int main() {
 		glBindVertexArray(VAO);
 
 		// Matrices
-		glm::mat4 view(1.0f);
-		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+		const float RADIUS = 10.0f;
+		float camX = sin(glfwGetTime()) * RADIUS;
+		float camZ = cos(glfwGetTime()) * RADIUS;
+		glm::mat4 view = glm::lookAt(
+			glm::vec3(camX, 0.0f, camZ),
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f)
+		);
 
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) INITIAL_SCREEN_WIDTH / (float) INITIAL_SCREEN_HEIGHT, 0.1f, 100.0f);
 
