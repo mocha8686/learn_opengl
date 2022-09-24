@@ -1,3 +1,4 @@
+#include "camera.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
 
@@ -7,7 +8,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <algorithm>
-#include <cmath>
 #include <iostream>
 
 const unsigned int INITIAL_SCREEN_WIDTH = 800;
@@ -20,10 +20,7 @@ float delta = 0.0f, last = 0.0f;
 
 float mixPercent = 0.5f;
 
-glm::vec3 cameraPos(0.0f, 0.0f, 0.3f);
-glm::vec3 cameraFront(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
-
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 bool firstMouse = true;
 float mouseLastX = INITIAL_SCREEN_WIDTH / 2, mouseLastY = INITIAL_SCREEN_HEIGHT / 2;
 float pitch = 0.0f, yaw = -90.0f;
@@ -45,18 +42,7 @@ void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
 	mouseLastX = xPos;
 	mouseLastY = yPos;
 
-	xOffset *= MOUSE_SENSITIVITY * delta;
-	yOffset *= MOUSE_SENSITIVITY * delta;
-
-	yaw += xOffset;
-	pitch = std::clamp(pitch + yOffset, -89.0f, 89.0f);
-
-	glm::vec3 direction(
-		cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
-		sin(glm::radians(pitch)),
-		sin(glm::radians(yaw)) * cos(glm::radians(pitch))
-	);
-	cameraFront = glm::normalize(direction);
+	camera.processCursor(xOffset, yOffset, delta);
 }
 
 void processInput(GLFWwindow *window) {
@@ -67,17 +53,17 @@ void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
 		mixPercent = std::max(mixPercent - (MIX_SPEED * delta), 0.0f);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraFront * CAMERA_SPEED * delta;
+		camera.processKeyboard(FORWARD, delta);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPos -= cameraFront * CAMERA_SPEED * delta;
+		camera.processKeyboard(BACKWARD, delta);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * CAMERA_SPEED * delta;
+		camera.processKeyboard(LEFT, delta);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * CAMERA_SPEED * delta;
+		camera.processKeyboard(RIGHT, delta);
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		cameraPos += cameraUp * CAMERA_SPEED * delta;
+		camera.processKeyboard(UP, delta);
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		cameraPos -= cameraUp * CAMERA_SPEED * delta;
+		camera.processKeyboard(DOWN, delta);
 }
 
 // Helper functions
@@ -205,7 +191,7 @@ int main() {
 
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
-		float now = glfwGetTime();
+		float now = static_cast<float>(glfwGetTime());
 		delta = now - last;
 		last = now;
 
@@ -224,12 +210,7 @@ int main() {
 		glBindVertexArray(VAO);
 
 		// Matrices
-		glm::mat4 view = glm::lookAt(
-			cameraPos,
-			cameraPos + cameraFront,
-			cameraUp
-		);
-
+		auto view = camera.getViewMatrix();
 		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) INITIAL_SCREEN_WIDTH / (float) INITIAL_SCREEN_HEIGHT, 0.1f, 100.0f);
 
 		program.uniformMat4("view", view);

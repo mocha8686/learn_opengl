@@ -35,6 +35,7 @@ set_target_properties(glm PROPERTIES
 
 add_executable(main
 	${CMAKE_SOURCE_DIR}/src/main.cpp
+	${CMAKE_SOURCE_DIR}/src/camera.cpp
 	${CMAKE_SOURCE_DIR}/src/shader.cpp
 	${CMAKE_SOURCE_DIR}/src/texture.cpp
 )
