@@ -1,6 +1,6 @@
 #include "camera.hpp"
 #include "shader.hpp"
-#include "texture.hpp"
+// #include "texture.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -12,13 +12,10 @@
 
 const unsigned int INITIAL_SCREEN_WIDTH = 800;
 const unsigned int INITIAL_SCREEN_HEIGHT = 600;
-const float MIX_SPEED = 1.0f;
 const float CAMERA_SPEED = 1.0f;
 const float MOUSE_SENSITIVITY = 1.0f;
 
 float delta = 0.0f, last = 0.0f;
-
-float mixPercent = 0.5f;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 bool firstMouse = true;
@@ -48,10 +45,6 @@ void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
 void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		mixPercent = std::min(mixPercent + (MIX_SPEED * delta), 1.0f);
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		mixPercent = std::max(mixPercent - (MIX_SPEED * delta), 0.0f);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		camera.processKeyboard(FORWARD, delta);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -104,7 +97,8 @@ int main() {
 
 	glEnable(GL_DEPTH_TEST);
 
-	ShaderProgram program("res/basicVertex.glsl", "res/basicFragment.glsl");
+	ShaderProgram globalProgram("res/globalVertex.glsl", "res/globalFrag.glsl");
+	ShaderProgram lightSourceProgram("res/globalVertex.glsl", "res/lightSourceFrag.glsl");
 
 	const GLfloat VERTICES[] = {
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -163,12 +157,10 @@ int main() {
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
-	// Initialize, bind, and configure vertex buffer object and vertex array object
 	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 
-	// VAO/VBO
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VERTICES), VERTICES, GL_STATIC_DRAW);
@@ -178,16 +170,17 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 0);
 	glEnableVertexAttribArray(0);
 	// TexCoords
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) (3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
+	// glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) (3 * sizeof(GLfloat)));
+	// glEnableVertexAttribArray(1);
 
-	// Textures
-	Texture
-	 	tex0("res/container.jpg", GL_RGB),
-		tex1("res/awesomeface.png", GL_RGBA);
+	GLuint lightVAO;
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 0);
+	glEnableVertexAttribArray(0);
 
-	program.uniformInt("tex0", 0);
-	program.uniformInt("tex1", 1);
+	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -202,27 +195,41 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Textures
-		tex0.use(GL_TEXTURE0);
-		tex1.use(GL_TEXTURE1);
-		program.uniformFloat("mixPercent", mixPercent);
-
-		glBindVertexArray(VAO);
-
 		// Matrices
 		auto view = camera.getViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float) INITIAL_SCREEN_WIDTH / (float) INITIAL_SCREEN_HEIGHT, 0.1f, 100.0f);
+		auto projection = glm::perspective(
+			glm::radians(45.0f),
+			static_cast<float>(INITIAL_SCREEN_WIDTH) / static_cast<float>(INITIAL_SCREEN_HEIGHT),
+			0.1f,
+			100.0f
+		);
 
-		program.uniformMat4("view", view);
-		program.uniformMat4("projection", projection);
-
-		for (unsigned int i = 0; i < 10; i++) {
+		{ // Object
 			glm::mat4 model(1.0f);
-			model = glm::translate(model, CUBE_POSITIONS[i]);
-			model = glm::rotate(model, glm::radians(20.0f * i), glm::normalize(glm::vec3(1.0f, 0.3f, 0.5f)));
 
-			program.uniformMat4("model", model);
+			globalProgram.uniformVec3("objectColor", 1.0f, 0.5f, 0.31f);
+			globalProgram.uniformVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
+			globalProgram.uniformMat4("model", model);
+			globalProgram.uniformMat4("view", view);
+			globalProgram.uniformMat4("projection", projection);
+
+			glBindVertexArray(VAO);
+			globalProgram.use();
+			glDrawArrays(GL_TRIANGLES, 0, 36);
+		}
+
+		{ // Light source
+			glm::mat4 model(1.0f);
+			model = glm::translate(model, lightPos);
+			model = glm::scale(model, glm::vec3(0.2f));
+
+			lightSourceProgram.uniformMat4("model", model);
+			lightSourceProgram.uniformMat4("view", view);
+			lightSourceProgram.uniformMat4("projection", projection);
+
+			glBindVertexArray(lightVAO);
+			lightSourceProgram.use();
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
