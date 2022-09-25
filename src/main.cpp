@@ -8,6 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 const unsigned int INITIAL_SCREEN_WIDTH = 800;
@@ -181,8 +182,8 @@ int main() {
 	glEnableVertexAttribArray(0);
 
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-	globalProgram.uniformVec3("worldLightPos", lightPos);
 	globalProgram.uniformVec3("lightColor", 1.0f, 1.0f, 1.0f);
+
 	globalProgram.uniformVec3("material.ambient", 1.0f, 0.5f, 0.31f);
 	globalProgram.uniformVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
 	globalProgram.uniformVec3("material.specular", 0.5f, 0.5f, 0.5f);
@@ -214,11 +215,23 @@ int main() {
 			glm::mat4 model(1.0f);
 			glm::mat3 normalMatrix(glm::transpose(glm::inverse(view * model)));
 
-
 			globalProgram.uniformMat4("model", model);
 			globalProgram.uniformMat4("view", view);
 			globalProgram.uniformMat4("projection", projection);
 			globalProgram.uniformMat3("normalMatrix", normalMatrix);
+
+			glm::vec3 lightColor(
+				sin(glfwGetTime() * 2.0f),
+				sin(glfwGetTime() * 0.7f),
+				sin(glfwGetTime() * 1.3f)
+			);
+			glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+			glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
+			globalProgram.uniformVec3("light.position", view * model * glm::vec4(lightPos.x, lightPos.y, lightPos.z, 1.0f));
+			globalProgram.uniformVec3("light.ambient", ambientColor);
+			globalProgram.uniformVec3("light.diffuse", diffuseColor);
+			globalProgram.uniformVec3("light.specular", glm::vec3(1.0f));
 
 			glBindVertexArray(VAO);
 			globalProgram.use();
