@@ -2,12 +2,11 @@
 
 in vec3 normal;
 in vec3 fragPos;
+in vec3 lightPos;
 out vec4 fragColor;
 
 uniform vec3 objectColor;
 uniform vec3 lightColor;
-uniform vec3 lightPos;
-uniform vec3 viewPos;
 
 const float AMBIENT_LIGHT_STRENGTH = 0.1;
 const float SPECULAR_LIGHT_STRENGTH = 0.5;
@@ -16,15 +15,15 @@ const int SHININESS = 32;
 void main() {
 	vec3 normal = normalize(normal);
 	vec3 lightDir = normalize(lightPos - fragPos);
-	float diffuseStrength = max(dot(normal, lightDir), 0.0);
+	float diffuseValue = max(dot(normal, lightDir), 0.0);
 
-	vec3 viewDir = normalize(viewPos - fragPos);
+	vec3 viewDir = normalize(-fragPos);
 	vec3 reflectDir = reflect(-lightDir, normal);
-	float specularStrength = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+	float specularValue = pow(max(dot(viewDir, reflectDir), 0.0), 32);
 
 	vec3 ambient = AMBIENT_LIGHT_STRENGTH * lightColor;
-	vec3 diffuse = diffuseStrength * lightColor;
-	vec3 specular = specularStrength * lightColor;
+	vec3 diffuse = diffuseValue * lightColor;
+	vec3 specular = SPECULAR_LIGHT_STRENGTH * specularValue * lightColor;
 
 	fragColor = vec4(objectColor * (ambient + diffuse + specular), 1.0);
 }
