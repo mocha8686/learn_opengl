@@ -207,13 +207,16 @@ int main() {
 
 		{ // Object
 			glm::mat4 model(1.0f);
+			glm::mat3 normalMatrix(glm::transpose(glm::inverse(model)));
 
 			globalProgram.uniformVec3("objectColor", 1.0f, 0.5f, 0.31f);
 			globalProgram.uniformVec3("lightColor", 1.0f, 1.0f, 1.0f);
+			globalProgram.uniformVec3("viewPos", camera.getPosition());
 
 			globalProgram.uniformMat4("model", model);
 			globalProgram.uniformMat4("view", view);
 			globalProgram.uniformMat4("projection", projection);
+			globalProgram.uniformMat3("normalMatrix", normalMatrix);
 
 			glBindVertexArray(VAO);
 			globalProgram.use();

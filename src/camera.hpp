@@ -50,6 +50,7 @@ class Camera {
 		{ updateCameraVectors(); };
 
 		glm::mat4 getViewMatrix() const { return glm::lookAt(position, position + front, up); };
+		glm::vec3 getPosition() const { return position; };
 		void processKeyboard(CameraDirection dir, float delta);
 		void processCursor(float xOffset, float yOffset, float delta, bool constrainPitch = true);
 };
