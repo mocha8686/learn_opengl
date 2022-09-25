@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 
 bool initializeShaderProgram(GLuint &id);
@@ -10,7 +12,15 @@ bool initializeShaderProgram(GLuint &id);
 class ShaderProgram {
 	private:
 		GLuint id;
-		GLint location(const std::string &name) const { return glGetUniformLocation(id, name.c_str()); };
+		GLint location(const std::string &name) const {
+			GLint res = glGetUniformLocation(id, name.c_str());
+			if (res == -1) {
+				std::ostringstream what;
+				what << "No uniform with name `" << name << "` in shader.";
+				throw std::runtime_error(what.str());
+			}
+			return res;
+		};
 
 	public:
 		ShaderProgram(const std::string &vertexSourcePath, const std::string &fragmentSourcePath);
