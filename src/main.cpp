@@ -182,6 +182,11 @@ int main() {
 
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 	globalProgram.uniformVec3("worldLightPos", lightPos);
+	globalProgram.uniformVec3("lightColor", 1.0f, 1.0f, 1.0f);
+	globalProgram.uniformVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+	globalProgram.uniformVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+	globalProgram.uniformVec3("material.specular", 0.5f, 0.5f, 0.5f);
+	globalProgram.uniformFloat("material.shininess", 32.0f);
 
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -209,8 +214,6 @@ int main() {
 			glm::mat4 model(1.0f);
 			glm::mat3 normalMatrix(glm::transpose(glm::inverse(view * model)));
 
-			globalProgram.uniformVec3("objectColor", 1.0f, 0.5f, 0.31f);
-			globalProgram.uniformVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
 			globalProgram.uniformMat4("model", model);
 			globalProgram.uniformMat4("view", view);

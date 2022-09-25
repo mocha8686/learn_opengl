@@ -1,11 +1,18 @@
 #version 330 core
 
+struct Material {
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+	float shininess;
+};
+
 in vec3 normal;
 in vec3 fragPos;
 in vec3 lightPos;
 out vec4 fragColor;
 
-uniform vec3 objectColor;
+uniform Material material;
 uniform vec3 lightColor;
 
 const float AMBIENT_LIGHT_STRENGTH = 0.1;
@@ -21,9 +28,9 @@ void main() {
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float specularValue = pow(max(dot(viewDir, reflectDir), 0.0), 32);
 
-	vec3 ambient = AMBIENT_LIGHT_STRENGTH * lightColor;
-	vec3 diffuse = diffuseValue * lightColor;
-	vec3 specular = SPECULAR_LIGHT_STRENGTH * specularValue * lightColor;
+	vec3 ambient = material.ambient * lightColor;
+	vec3 diffuse = material.diffuse * diffuseValue * lightColor;
+	vec3 specular = material.specular * specularValue * lightColor;
 
-	fragColor = vec4(objectColor * (ambient + diffuse + specular), 1.0);
+	fragColor = vec4(ambient + diffuse + specular, 1.0);
 }
