@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <cmath>
 #include <iostream>
 
 const unsigned int INITIAL_SCREEN_WIDTH = 800;
@@ -187,7 +188,6 @@ int main() {
 	diffuseMap.use(GL_TEXTURE0);
 	specularMap.use(GL_TEXTURE1);
 
-	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 	globalProgram.uniformVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
 	globalProgram.uniformInt("material.diffuseMap", 0);
@@ -216,14 +216,17 @@ int main() {
 			100.0f
 		);
 
+		glm::vec3 lightPos(0.6f + 2 * cos(now), 0.5f + 2.0f * sin(now), 2.0f);
+
 		{ // Object
 			globalProgram.uniformMat4("view", view);
 			globalProgram.uniformMat4("projection", projection);
 
-			globalProgram.uniformVec3("light.direction", -0.2f, -1.0f, -0.3f);
 			globalProgram.uniformVec3("light.ambient", glm::vec3(0.2f));
 			globalProgram.uniformVec3("light.diffuse", glm::vec3(0.5f));
 			globalProgram.uniformVec3("light.specular", glm::vec3(1.0f));
+			globalProgram.uniformFloat("light.linear", .09f);
+			globalProgram.uniformFloat("light.quadratic", .032f);
 
 			glBindVertexArray(VAO);
 			globalProgram.use();
@@ -238,6 +241,7 @@ int main() {
 
 				globalProgram.uniformMat4("model", model);
 				globalProgram.uniformMat3("normalMatrix", normalMatrix);
+				globalProgram.uniformVec3("light.position", view * glm::vec4(lightPos.x, lightPos.y, lightPos.z, 1.0f));
 
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}

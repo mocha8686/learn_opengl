@@ -7,10 +7,12 @@ struct Material {
 };
 
 struct Light {
-	vec3 direction;
+	vec3 position;
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
+	float linear;
+	float quadratic;
 };
 
 in vec3 normal;
@@ -28,7 +30,7 @@ const int SHININESS = 32;
 
 void main() {
 	vec3 normal = normalize(normal);
-	vec3 lightDir = normalize(-light.direction);
+	vec3 lightDir = normalize(light.position - fragPos);
 
 	vec3 diffuseMapValue = texture(material.diffuseMap, texCoords).rgb;
 	float diffuseValue = max(dot(normal, lightDir), 0.0);
@@ -37,9 +39,12 @@ void main() {
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float specularValue = pow(max(dot(viewDir, reflectDir), 0.0), 32);
 
-	vec3 ambient = light.ambient * diffuseMapValue * lightColor;
-	vec3 diffuse = light.diffuse * diffuseMapValue * diffuseValue * lightColor;
-	vec3 specular = light.specular * texture(material.specularMap, texCoords).rgb * specularValue * lightColor;
+	vec3 ambient = light.ambient * diffuseMapValue;
+	vec3 diffuse = light.diffuse * diffuseMapValue * diffuseValue;
+	vec3 specular = light.specular * texture(material.specularMap, texCoords).rgb * specularValue;
 
-	fragColor = vec4(ambient + diffuse + specular, 1.0);
+	float dist = distance(light.position, fragPos);
+	float attenuation = 1.0 / (1.0 + light.linear * dist + light.quadratic * dist * dist);
+
+	fragColor = vec4((ambient + diffuse + specular) * lightColor * attenuation, 1.0);
 }
