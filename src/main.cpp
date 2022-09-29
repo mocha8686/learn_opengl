@@ -183,13 +183,15 @@ int main() {
 	glEnableVertexAttribArray(0);
 
 	Texture diffuseMap("res/container2.png");
+	Texture specularMap("res/container2_specular.png");
 	diffuseMap.use(GL_TEXTURE0);
+	specularMap.use(GL_TEXTURE1);
 
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 	globalProgram.uniformVec3("lightColor", 1.0f, 1.0f, 1.0f);
 
 	globalProgram.uniformInt("material.diffuseMap", 0);
-	globalProgram.uniformVec3("material.specular", 0.5f, 0.5f, 0.5f);
+	globalProgram.uniformInt("material.specularMap", 1);
 	globalProgram.uniformFloat("material.shininess", 32.0f);
 
 	// Input/render loop
