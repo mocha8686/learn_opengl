@@ -3,7 +3,6 @@
 #include <glad/glad.h>
 
 #include <fstream>
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -55,7 +54,7 @@ class Shader {
 
 				std::ostringstream what;
 				const char *typeString = shaderEnumToString(type);
-				what << "Error compiling " << type << ": " << infoLog;
+				what << "Error compiling " << typeString << " " << sourcePath << ": " << infoLog;
 				throw std::runtime_error(what.str());
 			}
 		}

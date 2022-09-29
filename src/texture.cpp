@@ -7,12 +7,31 @@
 #include <string>
 #include <sstream>
 
-Texture::Texture(const std::string &imagePath, GLint format) {
+Texture::Texture(const std::string &imagePath) {
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char *data = stbi_load(imagePath.c_str(), &width, &height, &channels, 0);
 	if (!data) {
 		std::ostringstream what;
 		what << "Image `" << imagePath << "` failed to load.";
+		throw std::runtime_error(what.str());
+	}
+
+	GLenum format;
+	switch (channels) {
+		case 1:
+			format = GL_RED;
+			break;
+		case 3:
+			format = GL_RGB;
+			break;
+		case 4:
+			format = GL_RGBA;
+			break;
+	}
+
+	if (!format) {
+		std::ostringstream what;
+		what << "Unkown format of image " << imagePath << ".";
 		throw std::runtime_error(what.str());
 	}
 
