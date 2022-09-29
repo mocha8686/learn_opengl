@@ -7,7 +7,7 @@ struct Material {
 };
 
 struct Light {
-	vec3 position;
+	vec3 direction;
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
@@ -28,7 +28,7 @@ const int SHININESS = 32;
 
 void main() {
 	vec3 normal = normalize(normal);
-	vec3 lightDir = normalize(light.position - fragPos);
+	vec3 lightDir = normalize(-light.direction);
 
 	vec3 diffuseMapValue = texture(material.diffuseMap, texCoords).rgb;
 	float diffuseValue = max(dot(normal, lightDir), 0.0);

@@ -217,21 +217,31 @@ int main() {
 		);
 
 		{ // Object
-			glm::mat4 model(1.0f);
-			glm::mat3 normalMatrix(glm::transpose(glm::inverse(view * model)));
-
-			globalProgram.uniformMat4("model", model);
 			globalProgram.uniformMat4("view", view);
 			globalProgram.uniformMat4("projection", projection);
-			globalProgram.uniformMat3("normalMatrix", normalMatrix);
 
-			globalProgram.uniformVec3("light.position", view * model * glm::vec4(lightPos.x, lightPos.y, lightPos.z, 1.0f));
+			globalProgram.uniformVec3("light.direction", -0.2f, -1.0f, -0.3f);
 			globalProgram.uniformVec3("light.ambient", glm::vec3(0.2f));
 			globalProgram.uniformVec3("light.diffuse", glm::vec3(0.5f));
 			globalProgram.uniformVec3("light.specular", glm::vec3(1.0f));
 
 			glBindVertexArray(VAO);
 			globalProgram.use();
+
+			for (int i = 0; i < 10; i++) {
+				glm::mat4 model(1.0f);
+				model = glm::translate(model, CUBE_POSITIONS[i]);
+				float angle = 20.0f * i;
+				model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+				glm::mat3 normalMatrix(glm::transpose(glm::inverse(view * model)));
+
+				globalProgram.uniformMat4("model", model);
+				globalProgram.uniformMat3("normalMatrix", normalMatrix);
+
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+			}
+
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
