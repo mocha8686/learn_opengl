@@ -188,11 +188,18 @@ int main() {
 	diffuseMap.use(GL_TEXTURE0);
 	specularMap.use(GL_TEXTURE1);
 
-	globalProgram.uniformVec3("lightColor", 1.0f, 1.0f, 1.0f);
-
 	globalProgram.uniformInt("material.diffuseMap", 0);
 	globalProgram.uniformInt("material.specularMap", 1);
 	globalProgram.uniformFloat("material.shininess", 32.0f);
+
+	globalProgram.uniformFloat("light.phi", cos(glm::radians(12.5f)));
+
+	globalProgram.uniformVec3("light.ambient", glm::vec3(0.2f));
+	globalProgram.uniformVec3("light.diffuse", glm::vec3(0.5f));
+	globalProgram.uniformVec3("light.specular", glm::vec3(1.0f));
+
+	globalProgram.uniformFloat("light.linear", .09f);
+	globalProgram.uniformFloat("light.quadratic", .032f);
 
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -222,12 +229,6 @@ int main() {
 			globalProgram.uniformMat4("view", view);
 			globalProgram.uniformMat4("projection", projection);
 
-			globalProgram.uniformVec3("light.ambient", glm::vec3(0.2f));
-			globalProgram.uniformVec3("light.diffuse", glm::vec3(0.5f));
-			globalProgram.uniformVec3("light.specular", glm::vec3(1.0f));
-			globalProgram.uniformFloat("light.linear", .09f);
-			globalProgram.uniformFloat("light.quadratic", .032f);
-
 			glBindVertexArray(VAO);
 			globalProgram.use();
 
@@ -241,27 +242,24 @@ int main() {
 
 				globalProgram.uniformMat4("model", model);
 				globalProgram.uniformMat3("normalMatrix", normalMatrix);
-				globalProgram.uniformVec3("light.position", view * glm::vec4(lightPos.x, lightPos.y, lightPos.z, 1.0f));
 
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}
-
-			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
-		{ // Light source
-			glm::mat4 model(1.0f);
-			model = glm::translate(model, lightPos);
-			model = glm::scale(model, glm::vec3(0.2f));
+		// { // Light source
+		// 	glm::mat4 model(1.0f);
+		// 	model = glm::translate(model, lightPos);
+		// 	model = glm::scale(model, glm::vec3(0.2f));
 
-			lightSourceProgram.uniformMat4("model", model);
-			lightSourceProgram.uniformMat4("view", view);
-			lightSourceProgram.uniformMat4("projection", projection);
+		// 	lightSourceProgram.uniformMat4("model", model);
+		// 	lightSourceProgram.uniformMat4("view", view);
+		// 	lightSourceProgram.uniformMat4("projection", projection);
 
-			glBindVertexArray(lightVAO);
-			lightSourceProgram.use();
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
+		// 	glBindVertexArray(lightVAO);
+		// 	lightSourceProgram.use();
+		// 	glDrawArrays(GL_TRIANGLES, 0, 36);
+		// }
 
 		// Swap buffers and poll events
 		glfwSwapBuffers(window);

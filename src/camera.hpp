@@ -36,21 +36,22 @@ class Camera {
 	public:
 		Camera(
 			glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3 worldUp = glm::vec3(0.0f, 0.1f, 0.0f),
+			glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f),
 			float yaw = cameraDefaultVal::YAW,
 			float pitch = cameraDefaultVal::PITCH
-		) : position(position), worldUp(worldUp), yaw(yaw), pitch(pitch)
+		) : position(position), worldUp(glm::normalize(worldUp)), yaw(yaw), pitch(pitch)
 		{ updateCameraVectors(); };
 
 		Camera(
-			float posX, float posY, float posZ,
-			float worldUpX, float worldUpY, float worldUpZ,
-			float yaw, float pitch
-		) : position(glm::vec3(posX, posY, posZ)), worldUp(glm::vec3(worldUpX, worldUpY, worldUpZ)), yaw(yaw), pitch(pitch)
+			float posX = 0.0f, float posY = 0.0f, float posZ = 0.0f,
+			float worldUpX = 0.0f, float worldUpY = 1.0f, float worldUpZ = 0.0f,
+			float yaw = cameraDefaultVal::YAW, float pitch = cameraDefaultVal::PITCH
+		) : position(glm::vec3(posX, posY, posZ)), worldUp(glm::normalize(glm::vec3(worldUpX, worldUpY, worldUpZ))), yaw(yaw), pitch(pitch)
 		{ updateCameraVectors(); };
 
 		glm::mat4 getViewMatrix() const { return glm::lookAt(position, position + front, up); };
 		glm::vec3 getPosition() const { return position; };
+		glm::vec3 getFront() const { return front; };
 		void processKeyboard(CameraDirection dir, float delta);
 		void processCursor(float xOffset, float yOffset, float delta, bool constrainPitch = true);
 };
