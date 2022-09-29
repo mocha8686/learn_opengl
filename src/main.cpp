@@ -193,6 +193,7 @@ int main() {
 	globalProgram.uniformFloat("material.shininess", 32.0f);
 
 	globalProgram.uniformFloat("light.phi", cos(glm::radians(12.5f)));
+	globalProgram.uniformFloat("light.gamma", cos(glm::radians(17.5f)));
 
 	globalProgram.uniformVec3("light.ambient", glm::vec3(0.2f));
 	globalProgram.uniformVec3("light.diffuse", glm::vec3(0.5f));

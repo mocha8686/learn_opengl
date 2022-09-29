@@ -8,6 +8,7 @@ struct Material {
 
 struct Light {
 	float phi;
+	float gamma;
 
 	vec3 ambient;
 	vec3 diffuse;
@@ -31,27 +32,28 @@ const int SHININESS = 32;
 
 void main() {
 	vec3 lightDir = normalize(-fragPos);
+	vec3 normal = normalize(normal);
+	vec3 diffuseMapValue = texture(material.diffuseMap, texCoords).rgb;
+
+	// Ambient, diffuse, specular
+	float diffuseValue = max(dot(normal, lightDir), 0.0);
+
+	vec3 viewDir = normalize(-fragPos);
+	vec3 reflectDir = reflect(-lightDir, normal);
+	float specularValue = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+
+	vec3 ambient = light.ambient * diffuseMapValue;
+	vec3 diffuse = light.diffuse * diffuseMapValue * diffuseValue;
+	vec3 specular = light.specular * texture(material.specularMap, texCoords).rgb * specularValue;
+
+	// Attenuation
+	float dist = length(fragPos);
+	float attenuation = 1.0 / (1.0 + light.linear * dist + light.quadratic * dist * dist);
+
+	// Spot lighting
 	float theta = dot(lightDir, vec3(0.0, 0.0, 1.0));
+	float epsilon = light.phi - light.gamma;
+	float intensity = clamp((theta - light.gamma) / epsilon, 0.0, 1.0);
 
-	if (theta > light.phi) {
-		vec3 normal = normalize(normal);
-		vec3 diffuseMapValue = texture(material.diffuseMap, texCoords).rgb;
-
-		float diffuseValue = max(dot(normal, lightDir), 0.0);
-
-		vec3 viewDir = normalize(-fragPos);
-		vec3 reflectDir = reflect(-lightDir, normal);
-		float specularValue = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-
-		vec3 ambient = light.ambient * diffuseMapValue;
-		vec3 diffuse = light.diffuse * diffuseMapValue * diffuseValue;
-		vec3 specular = light.specular * texture(material.specularMap, texCoords).rgb * specularValue;
-
-		float dist = length(fragPos);
-		float attenuation = 1.0 / (1.0 + light.linear * dist + light.quadratic * dist * dist);
-
-		fragColor = vec4((ambient + (diffuse + specular) * attenuation), 1.0);
-	} else {
-		fragColor = vec4(light.ambient * texture(material.diffuseMap, texCoords).rgb, 1.0);
-	}
+	fragColor = vec4((diffuse + specular) * attenuation * intensity + ambient, 1.0);
 }
