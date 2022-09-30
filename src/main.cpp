@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <iostream>
+#include <string>
 
 const unsigned int INITIAL_SCREEN_WIDTH = 800;
 const unsigned int INITIAL_SCREEN_HEIGHT = 600;
@@ -157,6 +158,13 @@ int main() {
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
+	const glm::vec3 LIGHT_SOURCE_POSITIONS[] = {
+		glm::vec3( 0.7f,  0.2f,  2.0f),
+		glm::vec3( 2.3f, -3.3f, -4.0f),
+		glm::vec3(-4.0f,  2.0f, -12.0f),
+		glm::vec3( 0.0f,  0.0f, -3.0f)
+	};
+
 	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -192,15 +200,34 @@ int main() {
 	globalProgram.uniformInt("material.specularMap", 1);
 	globalProgram.uniformFloat("material.shininess", 32.0f);
 
-	globalProgram.uniformFloat("light.phi", cos(glm::radians(12.5f)));
-	globalProgram.uniformFloat("light.gamma", cos(glm::radians(17.5f)));
+	globalProgram.uniformVec3("directionalLight.direction", -0.2f, -1.0f, -0.3f);
+	globalProgram.uniformVec3("directionalLight.properties.ambient", 0.05f);
+	globalProgram.uniformVec3("directionalLight.properties.diffuse", 0.4f);
+	globalProgram.uniformVec3("directionalLight.properties.specular", 0.5f);
 
-	globalProgram.uniformVec3("light.ambient", glm::vec3(0.2f));
-	globalProgram.uniformVec3("light.diffuse", glm::vec3(0.5f));
-	globalProgram.uniformVec3("light.specular", glm::vec3(1.0f));
+	globalProgram.uniformVec3("spotLight.position", 0.0f);
+	globalProgram.uniformVec3("spotLight.direction", 0.0f, 0.0f, -1.0f);
+	globalProgram.uniformFloat("spotLight.phi", cos(glm::radians(12.5f)));
+	globalProgram.uniformFloat("spotLight.gamma", cos(glm::radians(15.0f)));
+	globalProgram.uniformFloat("spotLight.attenuation.linear", .09f);
+	globalProgram.uniformFloat("spotLight.attenuation.quadratic", .032f);
+	globalProgram.uniformVec3("spotLight.properties.ambient", 0.0f);
+	globalProgram.uniformVec3("spotLight.properties.diffuse", 1.0f);
+	globalProgram.uniformVec3("spotLight.properties.specular", 1.0f);
 
-	globalProgram.uniformFloat("light.linear", .09f);
-	globalProgram.uniformFloat("light.quadratic", .032f);
+	for (int i = 0; i < 4; i++) {
+		std::ostringstream lightStringStream;
+		lightStringStream << "pointLights[" << i << "].";
+		auto lightString = lightStringStream.str();
+
+		globalProgram.uniformFloat(lightString + "attenuation.linear", .09f);
+		globalProgram.uniformFloat(lightString + "attenuation.quadratic", .032f);
+
+		auto propertiesString = lightStringStream.str() + "properties.";
+		globalProgram.uniformVec3(propertiesString + "ambient", 0.05f);
+		globalProgram.uniformVec3(propertiesString + "diffuse", 0.8f);
+		globalProgram.uniformVec3(propertiesString + "specular", 1.0f);
+	}
 
 	// Input/render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -244,23 +271,37 @@ int main() {
 				globalProgram.uniformMat4("model", model);
 				globalProgram.uniformMat3("normalMatrix", normalMatrix);
 
+				for (int i = 0; i < 4; i++) {
+					std::ostringstream lightStringStream;
+					lightStringStream << "pointLights[" << i << "].";
+					auto lightString = lightStringStream.str();
+
+					auto position = LIGHT_SOURCE_POSITIONS[i];
+					auto viewSpaceLightPosition = view * glm::vec4(position.x, position.y, position.z, 1.0f);
+
+					globalProgram.uniformVec3(lightString + "position", glm::vec3(viewSpaceLightPosition.x, viewSpaceLightPosition.y, viewSpaceLightPosition.z));
+				}
+
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 			}
 		}
 
-		// { // Light source
-		// 	glm::mat4 model(1.0f);
-		// 	model = glm::translate(model, lightPos);
-		// 	model = glm::scale(model, glm::vec3(0.2f));
+		{ // Light source
+			lightSourceProgram.uniformMat4("view", view);
+			lightSourceProgram.uniformMat4("projection", projection);
 
-		// 	lightSourceProgram.uniformMat4("model", model);
-		// 	lightSourceProgram.uniformMat4("view", view);
-		// 	lightSourceProgram.uniformMat4("projection", projection);
+		 	for (int i = 0; i < 4; i++) {
+				glm::mat4 model(1.0f);
+				model = glm::translate(model, LIGHT_SOURCE_POSITIONS[i]);
+				model = glm::scale(model, glm::vec3(0.2f));
 
-		// 	glBindVertexArray(lightVAO);
-		// 	lightSourceProgram.use();
-		// 	glDrawArrays(GL_TRIANGLES, 0, 36);
-		// }
+				lightSourceProgram.uniformMat4("model", model);
+
+				glBindVertexArray(lightVAO);
+				lightSourceProgram.use();
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+			}
+		}
 
 		// Swap buffers and poll events
 		glfwSwapBuffers(window);
