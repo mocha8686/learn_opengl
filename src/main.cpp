@@ -13,8 +13,6 @@
 
 const unsigned int INITIAL_SCREEN_WIDTH = 800;
 const unsigned int INITIAL_SCREEN_HEIGHT = 600;
-const float CAMERA_SPEED = 1.0f;
-const float MOUSE_SENSITIVITY = 1.0f;
 
 float delta = 0.0f, last = 0.0f;
 
