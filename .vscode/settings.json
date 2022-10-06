@@ -7,6 +7,9 @@
 		"locale": "cpp",
 		"memory": "cpp",
 		"utility": "cpp",
-		"complex": "cpp"
+		"complex": "cpp",
+		"iomanip": "cpp",
+		"ios": "cpp",
+		"istream": "cpp"
 	}
 }

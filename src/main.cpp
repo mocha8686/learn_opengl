@@ -14,19 +14,24 @@
 const unsigned int INITIAL_SCREEN_WIDTH = 800;
 const unsigned int INITIAL_SCREEN_HEIGHT = 600;
 
+unsigned int windowWidth = INITIAL_SCREEN_WIDTH;
+unsigned int windowHeight = INITIAL_SCREEN_HEIGHT;
+
 float delta = 0.0f, last = 0.0f;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 bool firstMouse = true;
-float mouseLastX = INITIAL_SCREEN_WIDTH / 2, mouseLastY = INITIAL_SCREEN_HEIGHT / 2;
+float mouseLastX = windowWidth / 2, mouseLastY = windowHeight / 2;
 float pitch = 0.0f, yaw = -90.0f;
 
 // Callbacks
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-	glViewport(0, 0, width, height);
+void framebufferSizeCallback(GLFWwindow *window, int width, int height) {
+	windowWidth = width;
+	windowHeight = height;
+	glViewport(0, 0, windowWidth, windowHeight);
 }
 
-void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
+void mouseCallback(GLFWwindow *window, double xPos, double yPos) {
 	if (firstMouse) {
 		mouseLastX = xPos;
 		mouseLastY = yPos;
@@ -41,9 +46,11 @@ void mouse_callback(GLFWwindow *window, double xPos, double yPos) {
 	camera.processCursor(xOffset, yOffset, delta);
 }
 
+int prevQState = GLFW_RELEASE;
 void processInput(GLFWwindow *window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		camera.processKeyboard(FORWARD, delta);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -56,6 +63,23 @@ void processInput(GLFWwindow *window) {
 		camera.processKeyboard(UP, delta);
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 		camera.processKeyboard(DOWN, delta);
+
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+		if (prevQState == GLFW_PRESS) return;
+
+		switch (glfwGetInputMode(window, GLFW_CURSOR)) {
+			case GLFW_CURSOR_DISABLED:
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				break;
+			case GLFW_CURSOR_NORMAL:
+				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+				break;
+		}
+
+		prevQState = GLFW_PRESS;
+	} else {
+		prevQState = GLFW_RELEASE;
+	}
 }
 
 // Helper functions
@@ -74,10 +98,10 @@ GLFWwindow *initializeGLFW() {
 		return nullptr;
 	}
 	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetCursorPosCallback(window, mouseCallback);
 
 	return window;
 }
@@ -244,7 +268,7 @@ int main() {
 		auto view = camera.getViewMatrix();
 		auto projection = glm::perspective(
 			glm::radians(45.0f),
-			static_cast<float>(INITIAL_SCREEN_WIDTH) / static_cast<float>(INITIAL_SCREEN_HEIGHT),
+			static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
 			0.1f,
 			100.0f
 		);
