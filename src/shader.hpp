@@ -6,8 +6,6 @@
 #include <sstream>
 #include <stdexcept>
 
-bool initializeShaderProgram(GLuint &id);
-
 class ShaderProgram {
 	private:
 		GLuint id;
