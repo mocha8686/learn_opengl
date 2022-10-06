@@ -1,7 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
-#include <string>
+#include <iosfwd>
 
 class Texture {
 	private:

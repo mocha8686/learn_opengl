@@ -1,11 +1,15 @@
 #include "camera.hpp"
+#include "keyboard.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+// IWYU pragma: begin_exports
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+// IWYU pragma: end_exports
 
 #include <cmath>
 #include <iostream>
@@ -46,39 +50,18 @@ void mouseCallback(GLFWwindow *window, double xPos, double yPos) {
 	camera.processCursor(xOffset, yOffset, delta);
 }
 
-int prevQState = GLFW_RELEASE;
-void processInput(GLFWwindow *window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
+void moveCamera(CameraDirection dir) {
+	camera.processKeyboard(dir, delta);
+}
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.processKeyboard(FORWARD, delta);
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.processKeyboard(BACKWARD, delta);
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.processKeyboard(LEFT, delta);
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.processKeyboard(RIGHT, delta);
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		camera.processKeyboard(UP, delta);
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		camera.processKeyboard(DOWN, delta);
-
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-		if (prevQState == GLFW_PRESS) return;
-
-		switch (glfwGetInputMode(window, GLFW_CURSOR)) {
-			case GLFW_CURSOR_DISABLED:
-				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-				break;
-			case GLFW_CURSOR_NORMAL:
-				glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-				break;
-		}
-
-		prevQState = GLFW_PRESS;
-	} else {
-		prevQState = GLFW_RELEASE;
+void switchCursorState(GLFWwindow *window) {
+	switch (glfwGetInputMode(window, GLFW_CURSOR)) {
+		case GLFW_CURSOR_DISABLED:
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			break;
+		case GLFW_CURSOR_NORMAL:
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			break;
 	}
 }
 
@@ -119,6 +102,16 @@ int main() {
 	}
 
 	glEnable(GL_DEPTH_TEST);
+
+	Keyboard keyboard(window);
+	keyboard.addCallback(GLFW_KEY_ESCAPE, PRESS, [](auto *window) { glfwSetWindowShouldClose(window, true); });
+	keyboard.addCallback(GLFW_KEY_W, PRESS, [](auto *_) { moveCamera(FORWARD); });
+	keyboard.addCallback(GLFW_KEY_S, PRESS, [](auto *_) { moveCamera(BACKWARD); });
+	keyboard.addCallback(GLFW_KEY_A, PRESS, [](auto *_) { moveCamera(LEFT); });
+	keyboard.addCallback(GLFW_KEY_D, PRESS, [](auto *_) { moveCamera(RIGHT); });
+	keyboard.addCallback(GLFW_KEY_SPACE, PRESS, [](auto *_) { moveCamera(UP); });
+	keyboard.addCallback(GLFW_KEY_LEFT_SHIFT, PRESS, [](auto *_) { moveCamera(DOWN); });
+	keyboard.addCallback(GLFW_KEY_Q, RISING, switchCursorState);
 
 	ShaderProgram globalProgram("res/globalVertex.glsl", "res/globalFrag.glsl");
 	ShaderProgram lightSourceProgram("res/lightSourceVertex.glsl", "res/lightSourceFrag.glsl");
@@ -258,7 +251,7 @@ int main() {
 		last = now;
 
 		// Input
-		processInput(window);
+		keyboard.process();
 
 		// Render
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);

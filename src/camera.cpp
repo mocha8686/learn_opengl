@@ -1,9 +1,11 @@
 #include "camera.hpp"
 
+// IWYU pragma: begin_exports
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+// IWYU pragma: end_exports
 
-#include <algorithm>
+#include <algorithm> // IWYU pragma: export
 #include <cmath>
 
 void Camera::updateCameraVectors() {

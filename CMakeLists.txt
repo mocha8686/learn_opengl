@@ -38,6 +38,7 @@ add_executable(main
 	${CMAKE_SOURCE_DIR}/src/camera.cpp
 	${CMAKE_SOURCE_DIR}/src/shader.cpp
 	${CMAKE_SOURCE_DIR}/src/texture.cpp
+	${CMAKE_SOURCE_DIR}/src/keyboard.cpp
 )
 target_link_libraries(main ${OPENGL_LIBRARIES}
 	glad

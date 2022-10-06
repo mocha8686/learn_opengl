@@ -1,7 +1,9 @@
 #pragma once
 
+// IWYU pragma: begin_exports
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+// IWYU pragma: end_exports
 
 enum CameraDirection {
 	FORWARD,

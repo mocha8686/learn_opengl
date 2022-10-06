@@ -4,7 +4,6 @@
 #include <stb_image/stb_image.h>
 
 #include <stdexcept>
-#include <string>
 #include <sstream>
 
 Texture::Texture(const std::string &imagePath) {
