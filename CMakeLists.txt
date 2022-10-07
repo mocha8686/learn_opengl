@@ -7,6 +7,7 @@ include(CTest)
 enable_testing()
 
 find_program(iwyu_path NAMES include-what-you-use iwyu REQUIRED)
+set(iwyu_path "${iwyu_path};-Xiwyu;${CMAKE_SOURCE_DIR}/--mapping_file=mappings.imp")
 find_package(OpenGL REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/include ${OPENGL_INCLUDE_DIR})
@@ -39,6 +40,7 @@ add_executable(main
 	${CMAKE_SOURCE_DIR}/src/shader.cpp
 	${CMAKE_SOURCE_DIR}/src/texture.cpp
 	${CMAKE_SOURCE_DIR}/src/keyboard.cpp
+	${CMAKE_SOURCE_DIR}/src/context.cpp
 )
 target_link_libraries(main ${OPENGL_LIBRARIES}
 	glad

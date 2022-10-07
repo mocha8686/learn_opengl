@@ -1,3 +1,4 @@
+#include "context.hpp"
 #include "keyboard.hpp"
 #include <GLFW/glfw3.h>
 
@@ -22,19 +23,19 @@ void Keyboard::process() {
 		int state;
 		switch (action) {
 			case PRESS:
-				if (glfwGetKey(window, key) == GLFW_PRESS) (*cb)(window);
+				if (glfwGetKey(ctx.window, key) == GLFW_PRESS) (*cb)(ctx);
 				break;
 			case RELEASE:
-				if (glfwGetKey(window, key) == GLFW_RELEASE) (*cb)(window);
+				if (glfwGetKey(ctx.window, key) == GLFW_RELEASE) (*cb)(ctx);
 				break;
 			case RISING:
-				state = glfwGetKey(window, key);
-				if (prevState == GLFW_RELEASE && state == GLFW_PRESS) (*cb)(window);
+				state = glfwGetKey(ctx.window, key);
+				if (prevState == GLFW_RELEASE && state == GLFW_PRESS) (*cb)(ctx);
 				callbacks[keyPair].second = state;
 				break;
 			case FALLING:
-				state = glfwGetKey(window, key);
-				if (prevState == GLFW_PRESS && state == GLFW_RELEASE) (*cb)(window);
+				state = glfwGetKey(ctx.window, key);
+				if (prevState == GLFW_PRESS && state == GLFW_RELEASE) (*cb)(ctx);
 				callbacks[keyPair].second = state;
 				break;
 		}

@@ -1,10 +1,8 @@
 #pragma once
 
 #include <glad/glad.h>
-// IWYU pragma: begin_exports
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-// IWYU pragma: end_exports
 #include <sstream>
 #include <stdexcept>
 

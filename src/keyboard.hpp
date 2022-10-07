@@ -1,9 +1,9 @@
 #pragma once
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 #include <map>
 #include <utility>
+
+class Context;
 
 enum Action {
 	PRESS,
@@ -13,16 +13,16 @@ enum Action {
 };
 
 using Key = std::pair<int, Action>; // key, action
-using KeyCallback = void (*)(GLFWwindow *window);
+using KeyCallback = void (*)(Context &);
 using Data = std::pair<KeyCallback, int>; // cb, prev state
 
 class Keyboard {
 	private:
-	 	GLFWwindow *window;
+	 	Context &ctx;
 		std::map<Key, Data> callbacks;
 
 	public:
-		Keyboard(GLFWwindow *window) : window(window) {};
+		Keyboard(Context &ctx) : ctx(ctx) {};
 
 		bool addCallback(int key, Action action, KeyCallback cb);
 		bool removeCallback(int key, Action action);

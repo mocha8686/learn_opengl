@@ -1,11 +1,8 @@
 #include "camera.hpp"
 
-// IWYU pragma: begin_exports
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-// IWYU pragma: end_exports
-
-#include <algorithm> // IWYU pragma: export
+#include <algorithm>
 #include <cmath>
 
 void Camera::updateCameraVectors() {
@@ -20,7 +17,7 @@ void Camera::updateCameraVectors() {
 	up = glm::normalize(glm::cross(right, front));
 }
 
-void Camera::processKeyboard(CameraDirection dir, float delta) {
+void Camera::move(CameraDirection dir, float delta) {
 	switch (dir) {
 		case FORWARD:
 			position += front * speed * delta;

@@ -1,9 +1,7 @@
 #pragma once
 
-// IWYU pragma: begin_exports
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-// IWYU pragma: end_exports
 
 enum CameraDirection {
 	FORWARD,
@@ -45,7 +43,7 @@ class Camera {
 		{ updateCameraVectors(); };
 
 		Camera(
-			float posX = 0.0f, float posY = 0.0f, float posZ = 0.0f,
+			float posX, float posY, float posZ,
 			float worldUpX = 0.0f, float worldUpY = 1.0f, float worldUpZ = 0.0f,
 			float yaw = cameraDefaultVal::YAW, float pitch = cameraDefaultVal::PITCH
 		) : position(glm::vec3(posX, posY, posZ)), worldUp(glm::normalize(glm::vec3(worldUpX, worldUpY, worldUpZ))), yaw(yaw), pitch(pitch)
@@ -54,6 +52,6 @@ class Camera {
 		glm::mat4 getViewMatrix() const { return glm::lookAt(position, position + front, up); };
 		glm::vec3 getPosition() const { return position; };
 		glm::vec3 getFront() const { return front; };
-		void processKeyboard(CameraDirection dir, float delta);
+		void move(CameraDirection dir, float delta);
 		void processCursor(float xOffset, float yOffset, float delta, bool constrainPitch = true);
 };

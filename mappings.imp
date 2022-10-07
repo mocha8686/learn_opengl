@@ -1,0 +1,6 @@
+[
+	{ "include": ["@\"detail/.*\"", "private", "<glm/glm.hpp>", "public"] },
+	{ "include": ["\"gtc/matrix_transform.inl\"", "private", "<glm/gtc/matrix_transform.hpp>", "public"] },
+	{ "symbol": ["pair", "private", "<utility>", "public"] },
+	{ "symbol": ["clamp", "private", "<algorithm>", "public"] }
+]
