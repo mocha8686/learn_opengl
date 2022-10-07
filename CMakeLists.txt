@@ -34,15 +34,23 @@ set_target_properties(glm PROPERTIES
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/glm
 )
 
+add_library(assimp SHARED IMPORTED)
+set_target_properties(assimp PROPERTIES
+	IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/libassimp.5.2.5.dylib
+	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/assimp
+)
+
 add_executable(main
 	${CMAKE_SOURCE_DIR}/src/main.cpp
 	${CMAKE_SOURCE_DIR}/src/camera.cpp
+	${CMAKE_SOURCE_DIR}/src/context.cpp
+	${CMAKE_SOURCE_DIR}/src/keyboard.cpp
+	${CMAKE_SOURCE_DIR}/src/mesh.cpp
 	${CMAKE_SOURCE_DIR}/src/shader.cpp
 	${CMAKE_SOURCE_DIR}/src/texture.cpp
-	${CMAKE_SOURCE_DIR}/src/keyboard.cpp
-	${CMAKE_SOURCE_DIR}/src/context.cpp
 )
 target_link_libraries(main ${OPENGL_LIBRARIES}
+	assimp
 	glad
 	glfw
 	glm
