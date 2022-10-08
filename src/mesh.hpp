@@ -1,9 +1,13 @@
 #pragma once
 
-#include "shader.hpp"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <memory>
 #include <vector>
+
+class Context;
+class ShaderProgram;
+class Texture;
 
 struct Vertex {
 	glm::vec3 position;
@@ -11,31 +15,23 @@ struct Vertex {
 	glm::vec2 texCoords;
 };
 
-enum TextureType {
-	DIFFUSE,
-	SPECULAR,
-};
-
-struct Texture {
-	GLuint id;
-	TextureType type;
-};
-
 class Mesh {
 	private:
+		Context &ctx;
 		GLuint VAO, VBO, EBO;
 		void setupMesh();
 
 	public:
 		std::vector<Vertex> vertices;
 		std::vector<unsigned int> indices;
-		std::vector<Texture> textures;
+		std::vector<std::shared_ptr<Texture>> textures;
 
 		Mesh(
+			Context &ctx,
 			std::vector<Vertex> vertices,
 			std::vector<unsigned int> indices,
-			std::vector<Texture> textures
-		) : vertices(vertices), indices(indices), textures(textures) {
+			std::vector<std::shared_ptr<Texture>> textures
+		) : ctx(ctx), vertices(vertices), indices(indices), textures(textures) {
 			setupMesh();
 		};
 		~Mesh();

@@ -54,7 +54,7 @@ class Shader {
 
 				std::ostringstream what;
 				const char *typeString = shaderEnumToString(type);
-				what << "Error compiling " << typeString << " " << sourcePath << ": " << infoLog;
+				what << "Error compiling " << typeString << " `" << sourcePath << "`: " << infoLog;
 				throw std::runtime_error(what.str());
 			}
 		}
@@ -77,6 +77,8 @@ ShaderProgram::ShaderProgram(const std::string &vertexSourcePath, const std::str
 	if (!success) {
 		char infoLog[INFO_LOG_LENGTH];
 		glGetProgramInfoLog(id, INFO_LOG_LENGTH, nullptr, infoLog);
-		throw std::runtime_error(infoLog);
+		std::ostringstream what;
+		what << "Error linking shader program: " << infoLog;
+		throw std::runtime_error(what.str());
 	}
 }

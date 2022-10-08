@@ -110,12 +110,13 @@ vec3 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos) {
 }
 
 void main() {
-	vec3 normal = normalize(normal);
+	// vec3 normal = normalize(normal);
 
-	vec3 result = calculateDirectionalLight(directionalLight, normal, normalize(-fragPos));
-	for (int i = 0; i < POINT_LIGHTS; i++)
-		result += calculatePointLight(pointLights[i], normal, fragPos);
-	result += calculateSpotLight(spotLight, normal, fragPos);
+	// vec3 result = calculateDirectionalLight(directionalLight, normal, normalize(-fragPos));
+	// for (int i = 0; i < POINT_LIGHTS; i++)
+	// 	result += calculatePointLight(pointLights[i], normal, fragPos);
+	// result += calculateSpotLight(spotLight, normal, fragPos);
 
-	fragColor = vec4(result, 1.0);
+	// fragColor = vec4(result, 1.0);
+	fragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

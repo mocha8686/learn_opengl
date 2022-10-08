@@ -1,8 +1,12 @@
 #include "mesh.hpp"
 #include "shader.hpp"
+#include "texture.hpp"
 #include <glad/glad.h>
+#include <iosfwd>
+#include <stddef.h>
+#include <string>
 
-std::string textureTypeToString(TextureType type) {
+const std::string textureTypeToString(TextureType type) {
 	switch (type) {
 		case DIFFUSE:
 			return "Diffuse";
@@ -47,9 +51,11 @@ void Mesh::draw(ShaderProgram &shader) {
 	unsigned int diffuseN = 0;
 	unsigned int specularN = 0;
 	for (unsigned int i = 0; i < textures.size(); i++) {
-		glActiveTexture(GL_TEXTURE0 + i);
+		auto texture = textures[i];
+		auto type = textures[i]->getType();
+		texture->use(GL_TEXTURE0 + i);
+
 		std::string number;
-		auto type = textures[i].type;
 		switch (type) {
 			case DIFFUSE:
 				number = std::to_string(diffuseN++);
@@ -58,9 +64,7 @@ void Mesh::draw(ShaderProgram &shader) {
 				number = std::to_string(specularN++);
 				break;
 		}
-
 		shader.tryUniformInt(("material.tex" + textureTypeToString(type) + number).c_str(), i);
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
 	glActiveTexture(GL_TEXTURE0);
 

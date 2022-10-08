@@ -27,38 +27,38 @@ class ShaderProgram {
 		~ShaderProgram() { glDeleteProgram(id); };
 		void use() const { glUseProgram(id); };
 
-		void uniformBool(const std::string &name, bool value) const { glUniform1i(location(name), value); };
-		void tryUniformBool(const std::string &name, bool value) const { glUniform1i(tryLocation(name), value); };
-		void uniformInt(const std::string &name, int value) const { glUniform1i(location(name), value); };
-		void tryUniformInt(const std::string &name, int value) const { glUniform1i(tryLocation(name), value); };
-		void uniformFloat(const std::string &name, float value) const { glUniform1f(location(name), value); };
-		void tryUniformFloat(const std::string &name, float value) const { glUniform1f(tryLocation(name), value); };
+		void uniformBool(const std::string &name, bool value) const { use(); glUniform1i(location(name), value); };
+		void tryUniformBool(const std::string &name, bool value) const { use(); glUniform1i(tryLocation(name), value); };
+		void uniformInt(const std::string &name, int value) const { use(); glUniform1i(location(name), value); };
+		void tryUniformInt(const std::string &name, int value) const { use(); glUniform1i(tryLocation(name), value); };
+		void uniformFloat(const std::string &name, float value) const { use(); glUniform1f(location(name), value); };
+		void tryUniformFloat(const std::string &name, float value) const { use(); glUniform1f(tryLocation(name), value); };
 
-		void uniformVec2(const std::string &name, float x, float y) const { glUniform2f(location(name), x, y); };
-		void tryUniformVec2(const std::string &name, float x, float y) const { glUniform2f(tryLocation(name), x, y); };
-		void uniformVec2(const std::string &name, float value) const { glUniform2f(location(name), value, value); };
-		void tryUniformVec2(const std::string &name, float value) const { glUniform2f(tryLocation(name), value, value); };
-		void uniformVec2(const std::string &name, const glm::vec2 &value) const { glUniform2fv(location(name), 1, glm::value_ptr(value)); };
-		void tryUniformVec2(const std::string &name, const glm::vec2 &value) const { glUniform2fv(tryLocation(name), 1, glm::value_ptr(value)); };
+		void uniformVec2(const std::string &name, float x, float y) const { use(); glUniform2f(location(name), x, y); };
+		void tryUniformVec2(const std::string &name, float x, float y) const { use(); glUniform2f(tryLocation(name), x, y); };
+		void uniformVec2(const std::string &name, float value) const { use(); glUniform2f(location(name), value, value); };
+		void tryUniformVec2(const std::string &name, float value) const { use(); glUniform2f(tryLocation(name), value, value); };
+		void uniformVec2(const std::string &name, const glm::vec2 &value) const { use(); glUniform2fv(location(name), 1, glm::value_ptr(value)); };
+		void tryUniformVec2(const std::string &name, const glm::vec2 &value) const { use(); glUniform2fv(tryLocation(name), 1, glm::value_ptr(value)); };
 
-		void uniformVec3(const std::string &name, float x, float y, float z) const { glUniform3f(location(name), x, y, z); };
-		void tryUniformVec3(const std::string &name, float x, float y, float z) const { glUniform3f(tryLocation(name), x, y, z); };
-		void uniformVec3(const std::string &name, float value) const { glUniform3f(location(name), value, value, value); };
-		void tryUniformVec3(const std::string &name, float value) const { glUniform3f(tryLocation(name), value, value, value); };
-		void uniformVec3(const std::string &name, const glm::vec3 &value) const { glUniform3fv(location(name), 1, glm::value_ptr(value)); };
-		void tryUniformVec3(const std::string &name, const glm::vec3 &value) const { glUniform3fv(tryLocation(name), 1, glm::value_ptr(value)); };
+		void uniformVec3(const std::string &name, float x, float y, float z) const { use(); glUniform3f(location(name), x, y, z); };
+		void tryUniformVec3(const std::string &name, float x, float y, float z) const { use(); glUniform3f(tryLocation(name), x, y, z); };
+		void uniformVec3(const std::string &name, float value) const { use(); glUniform3f(location(name), value, value, value); };
+		void tryUniformVec3(const std::string &name, float value) const { use(); glUniform3f(tryLocation(name), value, value, value); };
+		void uniformVec3(const std::string &name, const glm::vec3 &value) const { use(); glUniform3fv(location(name), 1, glm::value_ptr(value)); };
+		void tryUniformVec3(const std::string &name, const glm::vec3 &value) const { use(); glUniform3fv(tryLocation(name), 1, glm::value_ptr(value)); };
 
-		void uniformVec4(const std::string &name, float x, float y, float z, float w) const { glUniform4f(location(name), x, y, z, w); };
-		void tryUniformVec4(const std::string &name, float x, float y, float z, float w) const { glUniform4f(tryLocation(name), x, y, z, w); };
-		void uniformVec4(const std::string &name, float value) const { glUniform4f(location(name), value, value, value, value); };
-		void tryUniformVec4(const std::string &name, float value) const { glUniform4f(tryLocation(name), value, value, value, value); };
-		void uniformVec4(const std::string &name, const glm::vec4 &value) const { glUniform4fv(location(name), 1, glm::value_ptr(value)); };
-		void tryUniformVec4(const std::string &name, const glm::vec4 &value) const { glUniform4fv(tryLocation(name), 1, glm::value_ptr(value)); };
+		void uniformVec4(const std::string &name, float x, float y, float z, float w) const { use(); glUniform4f(location(name), x, y, z, w); };
+		void tryUniformVec4(const std::string &name, float x, float y, float z, float w) const { use(); glUniform4f(tryLocation(name), x, y, z, w); };
+		void uniformVec4(const std::string &name, float value) const { use(); glUniform4f(location(name), value, value, value, value); };
+		void tryUniformVec4(const std::string &name, float value) const { use(); glUniform4f(tryLocation(name), value, value, value, value); };
+		void uniformVec4(const std::string &name, const glm::vec4 &value) const { use(); glUniform4fv(location(name), 1, glm::value_ptr(value)); };
+		void tryUniformVec4(const std::string &name, const glm::vec4 &value) const { use(); glUniform4fv(tryLocation(name), 1, glm::value_ptr(value)); };
 
-		void uniformMat2(const std::string &name, const glm::mat2 &value) const { glUniformMatrix2fv(location(name), 1, GL_FALSE, glm::value_ptr(value)); };
-		void tryUniformMat2(const std::string &name, const glm::mat2 &value) const { glUniformMatrix2fv(tryLocation(name), 1, GL_FALSE, glm::value_ptr(value)); };
-		void uniformMat3(const std::string &name, const glm::mat3 &value) const { glUniformMatrix3fv(location(name), 1, GL_FALSE, glm::value_ptr(value)); };
-		void tryUniformMat3(const std::string &name, const glm::mat3 &value) const { glUniformMatrix3fv(tryLocation(name), 1, GL_FALSE, glm::value_ptr(value)); };
-		void uniformMat4(const std::string &name, const glm::mat4 &value) const { glUniformMatrix4fv(location(name), 1, GL_FALSE, glm::value_ptr(value)); };
-		void tryUniformMat4(const std::string &name, const glm::mat4 &value) const { glUniformMatrix4fv(tryLocation(name), 1, GL_FALSE, glm::value_ptr(value)); };
+		void uniformMat2(const std::string &name, const glm::mat2 &value) const { use(); glUniformMatrix2fv(location(name), 1, GL_FALSE, glm::value_ptr(value)); };
+		void tryUniformMat2(const std::string &name, const glm::mat2 &value) const { use(); glUniformMatrix2fv(tryLocation(name), 1, GL_FALSE, glm::value_ptr(value)); };
+		void uniformMat3(const std::string &name, const glm::mat3 &value) const { use(); glUniformMatrix3fv(location(name), 1, GL_FALSE, glm::value_ptr(value)); };
+		void tryUniformMat3(const std::string &name, const glm::mat3 &value) const { use(); glUniformMatrix3fv(tryLocation(name), 1, GL_FALSE, glm::value_ptr(value)); };
+		void uniformMat4(const std::string &name, const glm::mat4 &value) const { use(); glUniformMatrix4fv(location(name), 1, GL_FALSE, glm::value_ptr(value)); };
+		void tryUniformMat4(const std::string &name, const glm::mat4 &value) const { use(); glUniformMatrix4fv(tryLocation(name), 1, GL_FALSE, glm::value_ptr(value)); };
 };

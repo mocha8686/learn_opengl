@@ -4,15 +4,15 @@
 
 bool Keyboard::addCallback(int key, Action action, KeyCallback cb) {
 	std::pair keyPair(key, action);
-	if (callbacks[keyPair].first != nullptr) return false;
+	if (callbacks.count(keyPair) == 1) return false;
 	callbacks[keyPair] = std::pair(cb, GLFW_RELEASE);
 	return true;
 }
 
 bool Keyboard::removeCallback(int key, Action action) {
 	std::pair keyPair(key, action);
-	if (callbacks[keyPair].first == nullptr) return false;
-	callbacks[keyPair].first = nullptr;
+	if (callbacks.count(keyPair) == 1) return false;
+	callbacks.erase(keyPair);
 	return true;
 }
 

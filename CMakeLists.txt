@@ -36,7 +36,7 @@ set_target_properties(glm PROPERTIES
 
 add_library(assimp SHARED IMPORTED)
 set_target_properties(assimp PROPERTIES
-	IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/libassimp.5.2.5.dylib
+	IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/assimp/bin/libassimp.dylib
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/assimp
 )
 
@@ -46,6 +46,7 @@ add_executable(main
 	${CMAKE_SOURCE_DIR}/src/context.cpp
 	${CMAKE_SOURCE_DIR}/src/keyboard.cpp
 	${CMAKE_SOURCE_DIR}/src/mesh.cpp
+	${CMAKE_SOURCE_DIR}/src/model.cpp
 	${CMAKE_SOURCE_DIR}/src/shader.cpp
 	${CMAKE_SOURCE_DIR}/src/texture.cpp
 )

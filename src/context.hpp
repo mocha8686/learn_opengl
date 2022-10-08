@@ -4,6 +4,12 @@
 #include "keyboard.hpp"
 #include <glad/glad.h> // IWYU pragma: keep
 #include <GLFW/glfw3.h>
+#include <iosfwd>
+#include <memory>
+#include <string> // IWYU pragma: keep
+#include <unordered_map>
+
+class Texture;
 
 const unsigned int INITIAL_WINDOW_WIDTH = 800;
 const unsigned int INITIAL_WINDOW_HEIGHT = 600;
@@ -33,6 +39,7 @@ class Context {
 		GLFWwindow *window;
 		Camera camera;
 		Keyboard keyboard;
+		std::unordered_map<std::string, std::shared_ptr<Texture>> textures;
 		bool firstMouse = true;
 
 		Context();
