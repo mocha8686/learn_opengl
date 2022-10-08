@@ -34,11 +34,7 @@ set_target_properties(glm PROPERTIES
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/glm
 )
 
-add_library(assimp SHARED IMPORTED)
-set_target_properties(assimp PROPERTIES
-	IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/lib/assimp/bin/libassimp.dylib
-	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_SOURCE_DIR}/include/assimp
-)
+add_subdirectory(${CMAKE_SOURCE_DIR}/lib/assimp)
 
 add_executable(main
 	${CMAKE_SOURCE_DIR}/src/main.cpp
