@@ -27,7 +27,7 @@ void Model::draw(ShaderProgram &shader) {
 
 void Model::loadModel(const std::string &path) {
 	Assimp::Importer importer;
-	const auto *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const auto *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
 		std::ostringstream what;
@@ -58,12 +58,14 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 	// Vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
 		auto v = mesh->mVertices[i];
-		auto n = mesh->mNormals[i];
-
 		Vertex vertex {
-			.position = glm::vec3(v.x, v.y, v.z),
-			.normal = glm::vec3(n.x, n.y, n.x)
+			.position = glm::vec3(v.x, v.y, v.z)
 		};
+
+		if (mesh->HasNormals()) {
+			auto n = mesh->mNormals[i];
+			vertex.normal = glm::vec3(n.x, n.y, n.x);
+		}
 
 		if (mesh->mTextureCoords[0]) {
 			auto tc = mesh->mTextureCoords[0][i];
@@ -103,12 +105,9 @@ std::vector<std::shared_ptr<Texture>> Model::loadMaterialTextures(aiMaterial *ma
 	for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
 		aiString str;
 		mat->GetTexture(type, i, &str);
-		auto fileName = std::string(str.C_Str());
+		auto filename = std::string(str.C_Str());
 
-		if (ctx.textures.count(fileName) == 1) {
-			auto texture = std::shared_ptr(ctx.textures[fileName]);
-			textures.push_back(texture);
-		} else {
+		if (ctx.textures.count(filename) != 1) {
 			TextureType enumType;
 			switch (type) {
 				case aiTextureType_DIFFUSE:
@@ -121,10 +120,11 @@ std::vector<std::shared_ptr<Texture>> Model::loadMaterialTextures(aiMaterial *ma
 					throw std::invalid_argument("Texture type is not yet supported.");
 			}
 
-			Texture texture(dir + "/" + fileName, enumType);
-			ctx.textures[fileName] = std::make_shared<Texture>(texture);
-			textures.push_back(ctx.textures[fileName]);
+			auto texture = std::make_shared<Texture>(Texture(dir + "/" + filename, enumType));
+			ctx.textures[filename] = texture;
 		}
+
+		textures.push_back(ctx.textures[filename]);
 	}
 
 	return textures;

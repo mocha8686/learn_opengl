@@ -109,36 +109,36 @@ void Context::loop() {
 	Model backpack(*this, "res/backpack/backpack.obj");
 	Model sphere(*this, "res/cube.obj");
 
-	// shader.uniformFloat("material.shininess", 32.0f);
+	shader.uniformFloat("material.shininess", 32.0f);
 
-	// shader.uniformVec3("directionalLight.direction", -0.2f, -1.0f, -0.3f);
-	// shader.uniformVec3("directionalLight.properties.ambient", 0.05f);
-	// shader.uniformVec3("directionalLight.properties.diffuse", 0.4f);
-	// shader.uniformVec3("directionalLight.properties.specular", 0.5f);
+	shader.uniformVec3("directionalLight.direction", -0.2f, -1.0f, -0.3f);
+	shader.uniformVec3("directionalLight.properties.ambient", 0.05f);
+	shader.uniformVec3("directionalLight.properties.diffuse", 0.4f);
+	shader.uniformVec3("directionalLight.properties.specular", 0.5f);
 
-	// shader.uniformVec3("spotLight.position", 0.0f);
-	// shader.uniformVec3("spotLight.direction", 0.0f, 0.0f, -1.0f);
-	// shader.uniformFloat("spotLight.phi", cos(glm::radians(12.5f)));
-	// shader.uniformFloat("spotLight.gamma", cos(glm::radians(15.0f)));
-	// shader.uniformFloat("spotLight.attenuation.linear", .09f);
-	// shader.uniformFloat("spotLight.attenuation.quadratic", .032f);
-	// shader.uniformVec3("spotLight.properties.ambient", 0.0f);
-	// shader.uniformVec3("spotLight.properties.diffuse", 1.0f);
-	// shader.uniformVec3("spotLight.properties.specular", 1.0f);
+	shader.uniformVec3("spotLight.position", 0.0f);
+	shader.uniformVec3("spotLight.direction", 0.0f, 0.0f, -1.0f);
+	shader.uniformFloat("spotLight.phi", cos(glm::radians(12.5f)));
+	shader.uniformFloat("spotLight.gamma", cos(glm::radians(15.0f)));
+	shader.uniformFloat("spotLight.attenuation.linear", .09f);
+	shader.uniformFloat("spotLight.attenuation.quadratic", .032f);
+	shader.uniformVec3("spotLight.properties.ambient", 0.0f);
+	shader.uniformVec3("spotLight.properties.diffuse", 1.0f);
+	shader.uniformVec3("spotLight.properties.specular", 1.0f);
 
-	// for (int i = 0; i < 4; i++) {
-	// 	std::ostringstream lightStringStream;
-	// 	lightStringStream << "pointLights[" << i << "].";
-	// 	auto lightString = lightStringStream.str();
+	for (int i = 0; i < 4; i++) {
+		std::ostringstream lightStringStream;
+		lightStringStream << "pointLights[" << i << "].";
+		auto lightString = lightStringStream.str();
 
-	// 	shader.uniformFloat(lightString + "attenuation.linear", .09f);
-	// 	shader.uniformFloat(lightString + "attenuation.quadratic", .032f);
+		shader.uniformFloat(lightString + "attenuation.linear", .09f);
+		shader.uniformFloat(lightString + "attenuation.quadratic", .032f);
 
-	// 	auto propertiesString = lightStringStream.str() + "properties.";
-	// 	shader.uniformVec3(propertiesString + "ambient", 0.05f);
-	// 	shader.uniformVec3(propertiesString + "diffuse", 0.8f);
-	// 	shader.uniformVec3(propertiesString + "specular", 1.0f);
-	// }
+		auto propertiesString = lightStringStream.str() + "properties.";
+		shader.uniformVec3(propertiesString + "ambient", 0.05f);
+		shader.uniformVec3(propertiesString + "diffuse", 0.8f);
+		shader.uniformVec3(propertiesString + "specular", 1.0f);
+	}
 
 	const glm::vec3 LIGHT_SOURCE_POSITIONS[] = {
 		glm::vec3( 0.7f,  0.2f,  2.0f),
@@ -185,7 +185,7 @@ void Context::loop() {
 			for (int i = 0; i < 4; i++) {
 				glm::mat4 model(1.0f);
 				model = glm::translate(model, LIGHT_SOURCE_POSITIONS[i]);
-				model = glm::scale(model, glm::vec3(0.2f));
+				model = glm::scale(model, glm::vec3(0.001f));
 				lightSourceShader.uniformMat4("model", model);
 				sphere.draw(lightSourceShader);
 			}

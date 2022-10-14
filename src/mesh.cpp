@@ -15,12 +15,6 @@ const std::string textureTypeToString(TextureType type) {
 	}
 }
 
-Mesh::~Mesh() {
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
-}
-
 void Mesh::setupMesh() {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -64,11 +58,15 @@ void Mesh::draw(ShaderProgram &shader) {
 				number = std::to_string(specularN++);
 				break;
 		}
-		shader.tryUniformInt(("material.tex" + textureTypeToString(type) + number).c_str(), i);
+
+		auto str = "material.tex" + textureTypeToString(type) + number;
+		shader.tryUniformInt(str.c_str(), i);
+		texture->use(GL_TEXTURE0 + i);
 	}
-	glActiveTexture(GL_TEXTURE0);
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(0);
 }
