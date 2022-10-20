@@ -1,7 +1,8 @@
 #include "context.hpp"
-#include "keyboard.hpp"
-#include "model.hpp"
-#include "shader.hpp"
+
+#include "graphics/model.hpp"
+#include "graphics/shader.hpp"
+#include "input/keyboard.hpp"
 
 #include <glad/glad.h> // IWYU pragma: keep
 #include <GLFW/glfw3.h>

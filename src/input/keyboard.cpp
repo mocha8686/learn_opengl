@@ -1,5 +1,6 @@
-#include "context.hpp"
 #include "keyboard.hpp"
+
+#include "../context.hpp"
 #include <GLFW/glfw3.h>
 
 bool Keyboard::addCallback(int key, Action action, KeyCallback cb) {

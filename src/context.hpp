@@ -1,7 +1,7 @@
 #pragma once
 
-#include "camera.hpp"
-#include "keyboard.hpp"
+#include "input/camera.hpp"
+#include "input/keyboard.hpp"
 #include <glad/glad.h> // IWYU pragma: keep
 #include <GLFW/glfw3.h>
 #include <iosfwd>
