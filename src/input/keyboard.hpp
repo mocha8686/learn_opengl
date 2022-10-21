@@ -13,8 +13,8 @@ enum Action {
 };
 
 using Key = std::pair<int, Action>; // key, action
-using KeyCallback = void (*)(Context &);
 using Data = std::pair<KeyCallback, int>; // cb, prev state
+using KeyCallback = void (*)(Context &);
 
 class Keyboard {
 	private:
