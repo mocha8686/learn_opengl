@@ -68,6 +68,18 @@
 		"unordered_map": "cpp",
 		"variant": "cpp",
 		"vector": "cpp",
-		"algorithm": "cpp"
+		"algorithm": "cpp",
+		"any": "cpp",
+		"cinttypes": "cpp",
+		"codecvt": "cpp",
+		"condition_variable": "cpp",
+		"forward_list": "cpp",
+		"iostream": "cpp",
+		"numeric": "cpp",
+		"queue": "cpp",
+		"random": "cpp",
+		"regex": "cpp",
+		"thread": "cpp",
+		"unordered_set": "cpp"
 	}
 }

@@ -1,7 +1,6 @@
 #include "model.hpp"
 #include "../context.hpp"
 #include "mesh.hpp"
-#include "shader.hpp"
 #include "texture.hpp"
 
 #include <assimp/Importer.hpp>
@@ -14,10 +13,10 @@
 #include <assimp/vector3.h>
 
 #include <memory>
+#include <optional>
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <unordered_map>
 
 void Model::draw(ShaderProgram &shader) {
 	for (unsigned int i = 0; i < meshes.size(); i++) {
@@ -106,8 +105,9 @@ std::vector<std::shared_ptr<Texture>> Model::loadMaterialTextures(aiMaterial *ma
 		aiString str;
 		mat->GetTexture(type, i, &str);
 		auto filename = std::string(str.C_Str());
+		auto textureOpt = ctx.textures.get(filename);
 
-		if (ctx.textures.count(filename) != 1) {
+		if (!textureOpt) {
 			TextureType enumType;
 			switch (type) {
 				case aiTextureType_DIFFUSE:
@@ -120,11 +120,12 @@ std::vector<std::shared_ptr<Texture>> Model::loadMaterialTextures(aiMaterial *ma
 					throw std::invalid_argument("Texture type is not yet supported.");
 			}
 
-			auto texture = std::make_shared<Texture>(Texture(dir + "/" + filename, enumType));
-			ctx.textures[filename] = texture;
+			auto texture = std::make_shared<Texture>(dir + "/" + filename, enumType);
+			ctx.textures.set(filename, texture);
+			textureOpt = ctx.textures.get(filename);
 		}
 
-		textures.push_back(ctx.textures[filename]);
+		textures.push_back(textureOpt.value());
 	}
 
 	return textures;

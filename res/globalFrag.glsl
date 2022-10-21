@@ -1,6 +1,6 @@
 #version 330 core
 
-const int POINT_LIGHTS = 4;
+const int MAX_LIGHTS = 32;
 
 struct Material {
 	sampler2D texDiffuse0;
@@ -45,9 +45,15 @@ in vec2 texCoords;
 out vec4 fragColor;
 
 uniform Material material;
-uniform DirectionalLight directionalLight;
-uniform PointLight pointLights[POINT_LIGHTS];
-uniform SpotLight spotLight;
+
+uniform int nDirectionalLights;
+uniform DirectionalLight directionalLights[MAX_LIGHTS];
+
+uniform int nPointLights;
+uniform PointLight pointLights[MAX_LIGHTS];
+
+uniform int nSpotLights;
+uniform SpotLight spotLights[MAX_LIGHTS];
 
 vec3 calculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir) {
 	vec3 lightDir = normalize(-light.direction);
@@ -112,10 +118,16 @@ vec3 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos) {
 void main() {
 	vec3 normal = normalize(normal);
 
-	vec3 result = calculateDirectionalLight(directionalLight, normal, normalize(-fragPos));
-	for (int i = 0; i < POINT_LIGHTS; i++)
+	vec3 result = vec3(0.0);
+
+	for (int i = 0; i < nDirectionalLights; i++)
+		result += calculateDirectionalLight(directionalLights[i], normal, normalize(-fragPos));
+
+	for (int i = 0; i < nPointLights; i++)
 		result += calculatePointLight(pointLights[i], normal, fragPos);
-	result += calculateSpotLight(spotLight, normal, fragPos);
+
+	for (int i = 0; i < nSpotLights; i++)
+		result += calculateSpotLight(spotLights[i], normal, fragPos);
 
 	fragColor = vec4(result, 1.0);
 }

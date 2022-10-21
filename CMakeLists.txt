@@ -39,12 +39,23 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/lib/assimp)
 add_executable(main
 	${CMAKE_SOURCE_DIR}/src/main.cpp
 	${CMAKE_SOURCE_DIR}/src/context.cpp
+
+	${CMAKE_SOURCE_DIR}/src/ecs/component.cpp
+	${CMAKE_SOURCE_DIR}/src/ecs/entity.cpp
+	${CMAKE_SOURCE_DIR}/src/ecs/scene.cpp
+
+	${CMAKE_SOURCE_DIR}/src/ecs/components/light.cpp
+	${CMAKE_SOURCE_DIR}/src/ecs/components/transform.hpp
+
 	${CMAKE_SOURCE_DIR}/src/graphics/mesh.cpp
 	${CMAKE_SOURCE_DIR}/src/graphics/model.cpp
 	${CMAKE_SOURCE_DIR}/src/graphics/shader.cpp
 	${CMAKE_SOURCE_DIR}/src/graphics/texture.cpp
+
 	${CMAKE_SOURCE_DIR}/src/input/camera.cpp
 	${CMAKE_SOURCE_DIR}/src/input/keyboard.cpp
+
+	${CMAKE_SOURCE_DIR}/src/util/cache.hpp
 )
 target_link_libraries(main ${OPENGL_LIBRARIES}
 	assimp
