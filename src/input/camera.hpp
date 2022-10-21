@@ -12,13 +12,6 @@ enum CameraDirection {
 	DOWN,
 };
 
-namespace cameraDefaultVal {
-	const float YAW = -90.0f;
-	const float PITCH = 0.0f;
-	const float SPEED = 2.5f;
-	const float SENSITIVITY = 1.0f;
-}
-
 class Camera {
 	private:
 		glm::vec3 position;
@@ -28,8 +21,8 @@ class Camera {
 		glm::vec3 worldUp;
 		float yaw;
 		float pitch;
-		float speed = cameraDefaultVal::SPEED;
-		float sensitivity = cameraDefaultVal::SENSITIVITY;
+		float speed = 2.5f;
+		float sensitivity = 1.0f;
 
 		void updateCameraVectors();
 
@@ -37,15 +30,15 @@ class Camera {
 		Camera(
 			glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
 			glm::vec3 worldUp = glm::vec3(0.0f, 1.0f, 0.0f),
-			float yaw = cameraDefaultVal::YAW,
-			float pitch = cameraDefaultVal::PITCH
+			float yaw = 0.0f,
+			float pitch = 0.0f
 		) : position(position), worldUp(glm::normalize(worldUp)), yaw(yaw), pitch(pitch)
 		{ updateCameraVectors(); };
 
 		Camera(
 			float posX, float posY, float posZ,
 			float worldUpX = 0.0f, float worldUpY = 1.0f, float worldUpZ = 0.0f,
-			float yaw = cameraDefaultVal::YAW, float pitch = cameraDefaultVal::PITCH
+			float yaw = 0.0f, float pitch = 0.0f
 		) : position(glm::vec3(posX, posY, posZ)), worldUp(glm::normalize(glm::vec3(worldUpX, worldUpY, worldUpZ))), yaw(yaw), pitch(pitch)
 		{ updateCameraVectors(); };
 
