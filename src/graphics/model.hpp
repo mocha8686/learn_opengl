@@ -26,5 +26,5 @@ class Model {
 
 	public:
 		Model(Context &ctx, const std::string &path) : ctx(ctx) { loadModel(path); };
-		void draw(ShaderProgram &shader);
+		void draw(std::shared_ptr<ShaderProgram> shader);
 };

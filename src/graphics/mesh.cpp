@@ -42,7 +42,7 @@ void Mesh::setupMesh() {
 	glBindVertexArray(0);
 }
 
-void Mesh::draw(ShaderProgram &shader) {
+void Mesh::draw(std::shared_ptr<ShaderProgram> shader) {
 	unsigned int diffuseN = 0;
 	unsigned int specularN = 0;
 	for (unsigned int i = 0; i < textures.size(); i++) {
@@ -61,7 +61,7 @@ void Mesh::draw(ShaderProgram &shader) {
 		}
 
 		auto str = "material.tex" + textureTypeToString(type) + number;
-		shader.tryUniformInt(str.c_str(), i);
+		shader->tryUniformInt(str.c_str(), i);
 		texture->use(GL_TEXTURE0 + i);
 	}
 

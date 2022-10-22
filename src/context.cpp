@@ -23,8 +23,6 @@
 #include <utility>
 #include <vector>
 
-#include <iostream>
-
 GLFWwindow *initializeGLFW() {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -213,13 +211,13 @@ void Context::loop() {
 				for (const auto &[light, lightTransform] : lights) {
 					switch (light->type) {
 						case DIRECTIONAL:
-							light->use(*shader, *transform, nDirectional++);
+							light->use(shader, transform, view, nDirectional++);
 							break;
 						case POINT:
-							light->use(*shader, *transform, nPoint++);
+							light->use(shader, transform, view, nPoint++);
 							break;
 						case SPOT:
-							light->use(*shader, *transform, nSpot++);
+							light->use(shader, transform, view, nSpot++);
 							break;
 					}
 				}
@@ -237,8 +235,9 @@ void Context::loop() {
 				modelMat = glm::rotate(modelMat, transform->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
 				modelMat = glm::scale(modelMat, transform->scale);
 				shader->uniformMat4("model", modelMat);
+				shader->tryUniformMat3("normalMatrix", glm::mat3(glm::transpose(glm::inverse(modelMat))));
 
-				model->draw(*shader);
+				model->draw(shader);
 			}
 		}
 

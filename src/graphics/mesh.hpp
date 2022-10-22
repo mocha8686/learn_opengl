@@ -35,5 +35,5 @@ class Mesh {
 			setupMesh();
 		};
 
-		void draw(ShaderProgram &shader);
+		void draw(std::shared_ptr<ShaderProgram> shader);
 };

@@ -18,7 +18,7 @@
 #include <stdexcept>
 #include <string>
 
-void Model::draw(ShaderProgram &shader) {
+void Model::draw(std::shared_ptr<ShaderProgram> shader) {
 	for (unsigned int i = 0; i < meshes.size(); i++) {
 		meshes[i].draw(shader);
 	}

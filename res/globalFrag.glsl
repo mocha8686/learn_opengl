@@ -39,9 +39,9 @@ struct SpotLight {
 	LightProperties properties;
 };
 
-in vec3 normal;
-in vec3 fragPos;
-in vec2 texCoords;
+in vec3 fFragPos;
+in vec3 fNormal;
+in vec2 fTexCoords;
 out vec4 fragColor;
 
 uniform Material material;
@@ -57,7 +57,7 @@ uniform SpotLight spotLights[MAX_LIGHTS];
 
 vec3 calculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir) {
 	vec3 lightDir = normalize(-light.direction);
-	vec3 diffuseMapValue = texture(material.texDiffuse0, texCoords).rgb;
+	vec3 diffuseMapValue = texture(material.texDiffuse0, fTexCoords).rgb;
 
 	float diffuseValue = max(dot(normal, lightDir), 0.0);
 
@@ -65,19 +65,18 @@ vec3 calculateDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDir
 	float specularValue = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
 	vec3 ambient = light.properties.ambient * diffuseMapValue;
-	vec3 diffuse = light.properties.diffuse * diffuseMapValue * diffuseValue;
-	vec3 specular = light.properties.specular * specularValue * texture(material.texSpecular0, texCoords).rgb;
+	vec3 diffuse = light.properties.diffuse * diffuseValue * diffuseMapValue;
+	vec3 specular = light.properties.specular * specularValue * texture(material.texSpecular0, fTexCoords).rgb;
 
 	return ambient + diffuse + specular;
 }
 
-vec3 calculatePointLight(PointLight light, vec3 normal, vec3 fragPos) {
+vec3 calculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
 	vec3 lightDir = normalize(light.position - fragPos);
-	vec3 diffuseMapValue = texture(material.texDiffuse0, texCoords).rgb;
+	vec3 diffuseMapValue = texture(material.texDiffuse0, fTexCoords).rgb;
 
 	float diffuseValue = max(dot(normal, lightDir), 0.0);
 
-	vec3 viewDir = normalize(-fragPos);
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float specularValue = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
@@ -85,19 +84,18 @@ vec3 calculatePointLight(PointLight light, vec3 normal, vec3 fragPos) {
 	float attenuation = 1.0 / (1.0 + light.attenuation.linear * dist + light.attenuation.quadratic * dist * dist);
 
 	vec3 ambient = light.properties.ambient * diffuseMapValue;
-	vec3 diffuse = light.properties.diffuse * diffuseMapValue * diffuseValue;
-	vec3 specular = light.properties.specular * texture(material.texSpecular0, texCoords).rgb * specularValue;
+	vec3 diffuse = light.properties.diffuse * diffuseValue * diffuseMapValue;
+	vec3 specular = light.properties.specular * specularValue * texture(material.texSpecular0, fTexCoords).rgb;
 
 	return (ambient + diffuse + specular) * attenuation;
 }
 
-vec3 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos) {
+vec3 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir) {
 	vec3 lightDir = normalize(light.position - fragPos);
-	vec3 diffuseMapValue = texture(material.texDiffuse0, texCoords).rgb;
+	vec3 diffuseMapValue = texture(material.texDiffuse0, fTexCoords).rgb;
 
 	float diffuseValue = max(dot(normal, lightDir), 0.0);
 
-	vec3 viewDir = normalize(-fragPos);
 	vec3 reflectDir = reflect(-lightDir, normal);
 	float specularValue = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
@@ -110,24 +108,25 @@ vec3 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos) {
 
 	vec3 ambient = light.properties.ambient * diffuseMapValue;
 	vec3 diffuse = light.properties.diffuse * diffuseMapValue * diffuseValue;
-	vec3 specular = light.properties.specular * texture(material.texSpecular0, texCoords).rgb * specularValue;
+	vec3 specular = light.properties.specular * texture(material.texSpecular0, fTexCoords).rgb * specularValue;
 
 	return (ambient + diffuse + specular) * attenuation * intensity;
 }
 
 void main() {
-	vec3 normal = normalize(normal);
+	vec3 normal = normalize(fNormal);
+	vec3 viewDir = normalize(-fFragPos);
 
 	vec3 result = vec3(0.0);
 
 	for (int i = 0; i < nDirectionalLights; i++)
-		result += calculateDirectionalLight(directionalLights[i], normal, normalize(-fragPos));
+		result += calculateDirectionalLight(directionalLights[i], normal, viewDir);
 
 	for (int i = 0; i < nPointLights; i++)
-		result += calculatePointLight(pointLights[i], normal, fragPos);
+		result += calculatePointLight(pointLights[i], normal, fFragPos, viewDir);
 
 	for (int i = 0; i < nSpotLights; i++)
-		result += calculateSpotLight(spotLights[i], normal, fragPos);
+		result += calculateSpotLight(spotLights[i], normal, fFragPos, viewDir);
 
 	fragColor = vec4(result, 1.0);
 }

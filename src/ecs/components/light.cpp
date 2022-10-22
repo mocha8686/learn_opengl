@@ -5,7 +5,7 @@
 #include <iosfwd>
 #include <string>
 
-void Light::use(ShaderProgram &shader, Transform &transform, int n) {
+void Light::use(std::shared_ptr<ShaderProgram> shader, std::shared_ptr<Transform> transform, glm::mat4 view, int n) {
 	std::string prefix;
 	switch (type) {
 		case DIRECTIONAL:
@@ -20,22 +20,32 @@ void Light::use(ShaderProgram &shader, Transform &transform, int n) {
 	}
 	prefix += std::to_string(n) + "].";
 
-	shader.tryUniformVec3(prefix + "properties.ambient", ambient);
-	shader.tryUniformVec3(prefix + "properties.diffuse", diffuse);
-	shader.tryUniformVec3(prefix + "properties.specular", specular);
+	shader->tryUniformVec3(prefix + "properties.ambient", ambient);
+	shader->tryUniformVec3(prefix + "properties.diffuse", diffuse);
+	shader->tryUniformVec3(prefix + "properties.specular", specular);
 
 	if (type != DIRECTIONAL) {
-		shader.tryUniformFloat(prefix + "attenuation.linear", linear);
-		shader.tryUniformFloat(prefix + "attenuation.quadratic", quadratic);
-		shader.tryUniformVec3(prefix + "position", transform.position);
+		shader->tryUniformFloat(prefix + "attenuation.linear", linear);
+		shader->tryUniformFloat(prefix + "attenuation.quadratic", quadratic);
+		shader->tryUniformVec3(
+			prefix + "position",
+			glm::vec3(
+				view * glm::vec4(
+					transform->position.x,
+					transform->position.y,
+					transform->position.z,
+					1.0f
+				)
+			)
+		);
 	}
 
 	if (type != POINT) {
-		shader.tryUniformVec3(prefix + "direction", transform.rotation);
+		shader->tryUniformVec3(prefix + "direction", transform->rotation);
 	}
 
 	if (type == SPOT) {
-		shader.tryUniformFloat(prefix + "phi", phi);
-		shader.tryUniformFloat(prefix + "gamma", gamma);
+		shader->tryUniformFloat(prefix + "phi", phi);
+		shader->tryUniformFloat(prefix + "gamma", gamma);
 	}
 }

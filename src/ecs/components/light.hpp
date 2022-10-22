@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <cmath>
+#include <memory>
 
 class ShaderProgram;
 struct Transform;
@@ -26,5 +27,5 @@ struct Light {
 	float gamma = cos(glm::radians(15.0f));
 
 	Light(LightType type) : type(type) {};
-	void use(ShaderProgram &shader, Transform &transform, int n);
+	void use(std::shared_ptr<ShaderProgram> shader, std::shared_ptr<Transform> transform, glm::mat4 view, int n);
 };
