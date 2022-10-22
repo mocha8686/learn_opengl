@@ -44,6 +44,7 @@ add_executable(main
 	${CMAKE_SOURCE_DIR}/src/ecs/entity.cpp
 	${CMAKE_SOURCE_DIR}/src/ecs/scene.cpp
 
+	${CMAKE_SOURCE_DIR}/src/ecs/components/camera.cpp
 	${CMAKE_SOURCE_DIR}/src/ecs/components/light.cpp
 	${CMAKE_SOURCE_DIR}/src/ecs/components/transform.hpp
 
@@ -52,7 +53,8 @@ add_executable(main
 	${CMAKE_SOURCE_DIR}/src/graphics/shader.cpp
 	${CMAKE_SOURCE_DIR}/src/graphics/texture.cpp
 
-	${CMAKE_SOURCE_DIR}/src/input/camera.cpp
+	${CMAKE_SOURCE_DIR}/src/input/cursor.cpp
+	${CMAKE_SOURCE_DIR}/src/input/input.cpp
 	${CMAKE_SOURCE_DIR}/src/input/keyboard.cpp
 
 	${CMAKE_SOURCE_DIR}/src/util/cache.hpp

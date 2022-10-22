@@ -24,19 +24,19 @@ void Keyboard::process() {
 		int state;
 		switch (action) {
 			case PRESS:
-				if (glfwGetKey(ctx.window, key) == GLFW_PRESS) (*cb)(ctx);
+				if (glfwGetKey(ctx.window, key) == GLFW_PRESS) cb(ctx);
 				break;
 			case RELEASE:
-				if (glfwGetKey(ctx.window, key) == GLFW_RELEASE) (*cb)(ctx);
+				if (glfwGetKey(ctx.window, key) == GLFW_RELEASE) cb(ctx);
 				break;
 			case RISING:
 				state = glfwGetKey(ctx.window, key);
-				if (prevState == GLFW_RELEASE && state == GLFW_PRESS) (*cb)(ctx);
+				if (prevState == GLFW_RELEASE && state == GLFW_PRESS) cb(ctx);
 				callbacks[keyPair].second = state;
 				break;
 			case FALLING:
 				state = glfwGetKey(ctx.window, key);
-				if (prevState == GLFW_PRESS && state == GLFW_RELEASE) (*cb)(ctx);
+				if (prevState == GLFW_PRESS && state == GLFW_RELEASE) cb(ctx);
 				callbacks[keyPair].second = state;
 				break;
 		}

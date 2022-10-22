@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../context.hpp"
+#include <functional>
 #include <map>
 #include <utility>
-
-class Context;
 
 enum Action {
 	PRESS,
@@ -12,9 +12,9 @@ enum Action {
 	FALLING,
 };
 
+using KeyCallback = std::function<void (Context &ctx)>;
 using Key = std::pair<int, Action>; // key, action
 using Data = std::pair<KeyCallback, int>; // cb, prev state
-using KeyCallback = void (*)(Context &);
 
 class Keyboard {
 	private:

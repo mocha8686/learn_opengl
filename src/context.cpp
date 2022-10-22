@@ -1,10 +1,12 @@
 #include "context.hpp"
 
+#include "ecs/components/camera.hpp"
 #include "ecs/components/light.hpp"
 #include "ecs/components/transform.hpp"
 #include "ecs/scene.hpp"
 #include "graphics/model.hpp"
 #include "graphics/shader.hpp"
+#include "input/input.hpp"
 #include "input/keyboard.hpp"
 
 #include <glad/glad.h>
@@ -20,6 +22,8 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+#include <iostream>
 
 GLFWwindow *initializeGLFW() {
 	glfwInit();
@@ -43,10 +47,8 @@ GLFWwindow *initializeGLFW() {
 Context::Context() :
 	screen { .width = INITIAL_WINDOW_WIDTH, .height = INITIAL_WINDOW_HEIGHT },
 	time { .now = 0.0f, .delta = 0.0f, .last = 0.0f },
-	cursor { .lastX = INITIAL_WINDOW_WIDTH / 2, .lastY = INITIAL_WINDOW_HEIGHT / 2 },
-	camera(0.0f, 0.0f, 3.0f),
 	window(initializeGLFW()),
-	keyboard(*this)
+	input(std::make_unique<InputManager>(*this))
 {
 	if (window == nullptr) {
 		throw std::runtime_error("Failed to initialize GLFW.");
@@ -72,26 +74,7 @@ void Context::processFramebufferSize() {
 	screen.width = width;
 	screen.height = height;
 	glViewport(0, 0, width, height);
-	firstMouse = true;
-}
-
-void Context::processCursorPos() {
-	double xPos, yPos;
-	glfwGetCursorPos(window, &xPos, &yPos);
-	if (xPos == 0 && yPos == 0) return;
-
-	if (firstMouse) {
-		cursor.lastX = xPos;
-		cursor.lastY = yPos;
-		firstMouse = false;
-	}
-
-	auto xOffset = xPos - cursor.lastX;
-	auto yOffset = cursor.lastY - yPos;
-	cursor.lastX = xPos;
-	cursor.lastY = yPos;
-
-	camera.processCursor(xOffset, yOffset, time.delta);
+	input->resetFirstMouse();
 }
 
 std::shared_ptr<ShaderProgram> Context::compileShader(const std::string &vertexSourcePath, const std::string &fragmentSourcePath) {
@@ -115,14 +98,23 @@ std::shared_ptr<Model> Context::loadModel(const std::string &path) {
 }
 
 void Context::loop() {
-	keyboard.addCallback(GLFW_KEY_ESCAPE, PRESS, [](auto &ctx) { glfwSetWindowShouldClose(ctx.window, true); });
-	keyboard.addCallback(GLFW_KEY_W, PRESS, [](auto &ctx) { ctx.moveCamera(FORWARD); });
-	keyboard.addCallback(GLFW_KEY_S, PRESS, [](auto &ctx) { ctx.moveCamera(BACKWARD); });
-	keyboard.addCallback(GLFW_KEY_A, PRESS, [](auto &ctx) { ctx.moveCamera(LEFT); });
-	keyboard.addCallback(GLFW_KEY_D, PRESS, [](auto &ctx) { ctx.moveCamera(RIGHT); });
-	keyboard.addCallback(GLFW_KEY_SPACE, PRESS, [](auto &ctx) { ctx.moveCamera(UP); });
-	keyboard.addCallback(GLFW_KEY_LEFT_SHIFT, PRESS, [](auto &ctx) { ctx.moveCamera(DOWN); });
-	keyboard.addCallback(GLFW_KEY_Q, RISING, [](auto &ctx) {
+	Scene scene;
+
+	auto mainCamera = scene.createEntity();
+	auto mainCameraTransform = std::make_shared<Transform>();
+	auto mainCameraComponent = std::make_shared<Camera>(mainCameraTransform);
+	mainCameraComponent->setMain(true);
+	scene.addComponent(mainCamera, mainCameraTransform);
+	scene.addComponent(mainCamera, mainCameraComponent);
+
+	input->addKeyCallback(GLFW_KEY_ESCAPE, PRESS, [](auto &ctx) { glfwSetWindowShouldClose(ctx.window, true); });
+	input->addKeyCallback(GLFW_KEY_W, PRESS, [mainCameraComponent, mainCameraTransform](auto &ctx) mutable { mainCameraComponent->move(mainCameraTransform, FORWARD, ctx.time.delta); });
+	input->addKeyCallback(GLFW_KEY_S, PRESS, [mainCameraComponent, mainCameraTransform](auto &ctx) mutable { mainCameraComponent->move(mainCameraTransform, BACKWARD, ctx.time.delta); });
+	input->addKeyCallback(GLFW_KEY_A, PRESS, [mainCameraComponent, mainCameraTransform](auto &ctx) mutable { mainCameraComponent->move(mainCameraTransform, LEFT, ctx.time.delta); });
+	input->addKeyCallback(GLFW_KEY_D, PRESS, [mainCameraComponent, mainCameraTransform](auto &ctx) mutable { mainCameraComponent->move(mainCameraTransform, RIGHT, ctx.time.delta); });
+	input->addKeyCallback(GLFW_KEY_SPACE, PRESS, [mainCameraComponent, mainCameraTransform](auto &ctx) mutable { mainCameraComponent->move(mainCameraTransform, UP, ctx.time.delta); });
+	input->addKeyCallback(GLFW_KEY_LEFT_SHIFT, PRESS, [mainCameraComponent, mainCameraTransform](auto &ctx) mutable { mainCameraComponent->move(mainCameraTransform, DOWN, ctx.time.delta); });
+	input->addKeyCallback(GLFW_KEY_Q, RISING, [](auto &ctx) {
 		switch (glfwGetInputMode(ctx.window, GLFW_CURSOR)) {
 			case GLFW_CURSOR_DISABLED:
 				glfwSetInputMode(ctx.window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -131,7 +123,10 @@ void Context::loop() {
 				glfwSetInputMode(ctx.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 				break;
 		}
-		ctx.firstMouse = true;
+		ctx.input->resetFirstMouse();
+	});
+	input->addCursorPosCallback([mainCameraComponent, mainCameraTransform](auto &ctx, auto xOffset, auto yOffset) mutable {
+		mainCameraComponent->processCursor(mainCameraTransform, xOffset, yOffset, ctx.time.delta);
 	});
 
 	auto globalShader = compileShader("res/globalVertex.glsl", "res/globalFrag.glsl");
@@ -145,8 +140,6 @@ void Context::loop() {
 		glm::vec3(-4.0f,  2.0f, -12.0f),
 		glm::vec3( 0.0f,  0.0f, -3.0f)
 	};
-
-	Scene scene;
 
 	auto backpack = scene.createEntity();
 	auto backpackModel = loadModel("res/backpack/backpack.obj");
@@ -183,13 +176,13 @@ void Context::loop() {
 		time.last = time.now;
 
 		processFramebufferSize();
-		processCursorPos();
-		keyboard.process();
+		input->process();
 
 		// Render
 		glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		// Get lights
 		std::vector<std::pair<std::shared_ptr<Light>, std::shared_ptr<Transform>>> lights;
 		for (auto entity : scene.getActiveEntities()) {
 			auto lightOpt = scene.getComponent<Light>(entity);
@@ -199,7 +192,7 @@ void Context::loop() {
 			}
 		}
 
-		auto view = camera.getViewMatrix();
+		auto view = mainCameraComponent->getViewMatrix(mainCameraTransform);
 		auto projection = glm::perspective(
 			glm::radians(45.0f),
 			static_cast<float>(screen.width) / static_cast<float>(screen.height),
