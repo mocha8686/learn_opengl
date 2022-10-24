@@ -123,6 +123,12 @@ void Context::loop() {
 		}
 		ctx.input->resetFirstMouse();
 	});
+	input->addKeyCallback(GLFW_KEY_R, RISING, [](auto &ctx) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	});
+	input->addKeyCallback(GLFW_KEY_F, RISING, [](auto &ctx) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	});
 	input->addCursorPosCallback([mainCameraComponent, mainCameraTransform](auto &ctx, auto xOffset, auto yOffset) mutable {
 		mainCameraComponent->processCursor(mainCameraTransform, xOffset, yOffset, ctx.time.delta);
 	});
