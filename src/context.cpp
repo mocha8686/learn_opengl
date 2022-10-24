@@ -14,6 +14,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <cmath>
 #include <optional>
 #include <set>
 #include <stdexcept>
@@ -22,6 +23,9 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+
+// TODO: debug
+#include <iostream>
 
 GLFWwindow *initializeGLFW() {
 	glfwInit();
@@ -154,7 +158,7 @@ void Context::loop() {
 	scene.addComponent(backpack, globalShader);
 
 	auto directionalLight = scene.createEntity();
-	Transform directionalLightTransform(glm::vec3(0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+	Transform directionalLightTransform(glm::vec3(0.0f), glm::vec3(-65.0f, -90.0f, 0.0f));
 	Light directionalLightComponent(DIRECTIONAL);
 	directionalLightComponent.ambient = glm::vec3(0.05f);
 	directionalLightComponent.diffuse = glm::vec3(0.4f);
@@ -204,6 +208,13 @@ void Context::loop() {
 			100.0f
 		);
 
+		std::cout
+		<< "===================================\n"
+		<< "           Camera rotation: " << mainCameraTransform->rotation.x << " " << mainCameraTransform->rotation.y << " " << mainCameraTransform->rotation.z << "\n"
+		<< "Directional light rotation: " << directionalLightTransform.rotation.x << " " << directionalLightTransform.rotation.y << " " << directionalLightTransform.rotation.z << "\n"
+		<< "                Difference: " << mainCameraTransform->rotation.x - directionalLightTransform.rotation.x << " " << mainCameraTransform->rotation.y - directionalLightTransform.rotation.y << " " << mainCameraTransform->rotation.z - directionalLightTransform.rotation.z << "\n"
+		<< "===================================\n";
+
 		for (auto entity : scene.getActiveEntities()) {
 			auto modelOpt = scene.getComponent<Model>(entity);
 			if (modelOpt) {
@@ -217,13 +228,13 @@ void Context::loop() {
 				for (const auto &[light, lightTransform] : lights) {
 					switch (light->type) {
 						case DIRECTIONAL:
-							light->use(shader, transform, view, nDirectional++);
+							light->use(shader, lightTransform, view, nDirectional++);
 							break;
 						case POINT:
-							light->use(shader, transform, view, nPoint++);
+							light->use(shader, lightTransform, view, nPoint++);
 							break;
 						case SPOT:
-							light->use(shader, transform, view, nSpot++);
+							light->use(shader, lightTransform, view, nSpot++);
 							break;
 					}
 				}
@@ -236,9 +247,9 @@ void Context::loop() {
 
 				glm::mat4 modelMat(1.0f);
 				modelMat = glm::translate(modelMat, transform->position);
-				modelMat = glm::rotate(modelMat, transform->rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-				modelMat = glm::rotate(modelMat, transform->rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-				modelMat = glm::rotate(modelMat, transform->rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+				modelMat = glm::rotate(modelMat, glm::radians(transform->rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+				modelMat = glm::rotate(modelMat, glm::radians(transform->rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+				modelMat = glm::rotate(modelMat, glm::radians(transform->rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
 				modelMat = glm::scale(modelMat, transform->scale);
 				shader->uniformMat4("model", modelMat);
 				shader->tryUniformMat3("normalMatrix", glm::mat3(glm::transpose(glm::inverse(modelMat))));

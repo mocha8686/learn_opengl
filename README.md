@@ -9,4 +9,4 @@ TODO
 - [x] Optional return type
 - [x] Move input to context and use ECS
 - [ ] ~~Move scene to context and use a scene manager~~
-- [ ] Fix lighting
+- [x] Fix lighting
