@@ -24,9 +24,6 @@
 #include <utility>
 #include <vector>
 
-// TODO: debug
-#include <iostream>
-
 GLFWwindow *initializeGLFW() {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -207,13 +204,6 @@ void Context::loop() {
 			0.1f,
 			100.0f
 		);
-
-		std::cout
-		<< "===================================\n"
-		<< "           Camera rotation: " << mainCameraTransform->rotation.x << " " << mainCameraTransform->rotation.y << " " << mainCameraTransform->rotation.z << "\n"
-		<< "Directional light rotation: " << directionalLightTransform.rotation.x << " " << directionalLightTransform.rotation.y << " " << directionalLightTransform.rotation.z << "\n"
-		<< "                Difference: " << mainCameraTransform->rotation.x - directionalLightTransform.rotation.x << " " << mainCameraTransform->rotation.y - directionalLightTransform.rotation.y << " " << mainCameraTransform->rotation.z - directionalLightTransform.rotation.z << "\n"
-		<< "===================================\n";
 
 		for (auto entity : scene.getActiveEntities()) {
 			auto modelOpt = scene.getComponent<Model>(entity);
