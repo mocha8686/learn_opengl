@@ -1,6 +1,6 @@
 #pragma once
 
-#include "entity.hpp"
+#include "types.hpp"
 #include <array>
 #include <memory>
 #include <optional>
@@ -10,25 +10,22 @@
 #include <unordered_map>
 #include <utility>
 
-template <typename T>
-using OptionalComponent = std::optional<std::shared_ptr<T>>;
-
 class IComponentArray {
 	public:
 		virtual ~IComponentArray() = default;
-		virtual void onEntityDestroyed(Entity entity) = 0;
+		virtual void onEntityDestroyed(EntityId entity) = 0;
 };
 
 template <typename T>
 class ComponentArray : public IComponentArray {
 	private:
 		std::array<std::shared_ptr<T>, MAX_ENTITIES> componentArray {};
-		std::unordered_map<Entity, size_t> entityToIndexMap {};
-		std::unordered_map<size_t, Entity> indexToEntityMap {};
+		std::unordered_map<EntityId, size_t> entityToIndexMap {};
+		std::unordered_map<size_t, EntityId> indexToEntityMap {};
 		size_t nComponents = 0;
 
 	public:
-		void insertData(Entity entity, std::shared_ptr<T> component) {
+		void insertData(EntityId entity, std::shared_ptr<T> component) {
 			if (entityToIndexMap.count(entity) == 1)
 				throw std::runtime_error("Entity " + std::to_string(entity) + " already has a(n) `" + typeid(T).name() + "` component.");
 
@@ -38,7 +35,7 @@ class ComponentArray : public IComponentArray {
 			nComponents++;
 		};
 
-		void removeData(Entity entity) {
+		void removeData(EntityId entity) {
 			if (entityToIndexMap.count(entity) != 1)
 				throw std::runtime_error("Entity " + std::to_string(entity) + " does not have a(n) `" + typeid(T).name() + "` component.");
 
@@ -54,13 +51,13 @@ class ComponentArray : public IComponentArray {
 			indexToEntityMap.erase(nComponents);
 		};
 
-		OptionalComponent<T> getData(Entity entity) {
+		OptionalComponent<T> getData(EntityId entity) {
 			auto it = entityToIndexMap.find(entity);
 			if (it == entityToIndexMap.end()) return std::nullopt;
 			return std::optional<std::shared_ptr<T>>(componentArray[it->second]);
 		};
 
-		void onEntityDestroyed(Entity entity) override {
+		void onEntityDestroyed(EntityId entity) override {
 			removeData(entity);
 		};
 };
@@ -82,7 +79,7 @@ class ComponentManager {
 
 	public:
 		template <typename T>
-		void addComponent(Entity entity, std::shared_ptr<T> component) {
+		void addComponent(EntityId entity, std::shared_ptr<T> component) {
 			std::shared_ptr<ComponentArray<T>> componentArray;
 			try {
 				componentArray = getComponentArray<T>();
@@ -96,12 +93,12 @@ class ComponentManager {
 		};
 
 		template <typename T>
-		void removeComponent(Entity entity) {
+		void removeComponent(EntityId entity) {
 			getComponentArray<T>()->removeData(entity);
 		};
 
 		template <typename T>
-		OptionalComponent<T> getComponent(Entity entity) {
+		OptionalComponent<T> getComponent(EntityId entity) {
 			try {
 				return getComponentArray<T>()->getData(entity);
 			} catch (const std::runtime_error&) {
@@ -109,5 +106,5 @@ class ComponentManager {
 			}
 		};
 
-		void onEntityDestroyed(Entity entity);
+		void onEntityDestroyed(EntityId entity);
 };

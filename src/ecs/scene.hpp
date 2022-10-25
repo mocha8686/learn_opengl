@@ -1,39 +1,41 @@
 #pragma once
 
 #include "component.hpp"
-#include "entity.hpp"
+#include "types.hpp"
 #include <memory>
-#include <set>
+
+class Entity;
+class EntityManager;
 
 class Scene {
 	private:
 		std::unique_ptr<EntityManager> entityManager = std::make_unique<EntityManager>();
 		std::unique_ptr<ComponentManager> componentManager = std::make_unique<ComponentManager>();
-		std::set<Entity> activeEntities {};
+		ActiveEntityMap activeEntities {};
 
 	public:
-		Entity createEntity();
-		void destroyEntity(Entity entity);
+		std::shared_ptr<Entity> createEntity();
+		void destroyEntity(EntityId entity);
 
 		template <typename T>
-		void addComponent(Entity entity, T component) {
+		void addComponent(EntityId entity, T component) {
 			componentManager->addComponent(entity, std::make_shared<T>(component));
 		};
 
 		template <typename T>
-		void addComponent(Entity entity, std::shared_ptr<T> component) {
+		void addComponent(EntityId entity, std::shared_ptr<T> component) {
 			componentManager->addComponent(entity, component);
 		};
 
 		template <typename T>
-		void removeComponent(Entity entity) {
+		void removeComponent(EntityId entity) {
 			componentManager->removeComponent<T>(entity);
 		};
 
 		template <typename T>
-		OptionalComponent<T> getComponent(Entity entity) {
+		OptionalComponent<T> getComponent(EntityId entity) {
 			return componentManager->getComponent<T>(entity);
 		};
 
-		std::set<Entity> &getActiveEntities() { return activeEntities; };
+		ActiveEntityMap &getActiveEntities() { return activeEntities; };
 };

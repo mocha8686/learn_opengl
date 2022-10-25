@@ -43,6 +43,7 @@ add_executable(main
 	${CMAKE_SOURCE_DIR}/src/ecs/component.cpp
 	${CMAKE_SOURCE_DIR}/src/ecs/entity.cpp
 	${CMAKE_SOURCE_DIR}/src/ecs/scene.cpp
+	${CMAKE_SOURCE_DIR}/src/ecs/types.hpp
 
 	${CMAKE_SOURCE_DIR}/src/ecs/components/camera.cpp
 	${CMAKE_SOURCE_DIR}/src/ecs/components/light.cpp

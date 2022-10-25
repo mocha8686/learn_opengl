@@ -7,7 +7,7 @@
 #include <type_traits>
 #include <typeinfo>
 
-void ComponentManager::onEntityDestroyed(Entity entity) {
+void ComponentManager::onEntityDestroyed(EntityId entity) {
 	for (const auto &[_, componentArray] : componentArrays) {
 		componentArray->onEntityDestroyed(entity);
 	}

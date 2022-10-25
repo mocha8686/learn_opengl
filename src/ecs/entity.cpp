@@ -4,21 +4,19 @@
 #include <string>
 
 EntityManager::EntityManager() {
-	for (Entity e = 0; e < MAX_ENTITIES; e++) {
-		availableEntities.push(e);
-	}
+	for (EntityId e = 0; e < MAX_ENTITIES; e++)
+		availableEntityIds.push(e);
 }
 
-Entity EntityManager::createEntity() {
+std::shared_ptr<Entity> EntityManager::createEntity() {
 	if (nEntities >= MAX_ENTITIES) throw std::length_error("Entity limit exceeded.");
-	auto entity = availableEntities.front();
-	availableEntities.pop();
+	auto entity = std::make_shared<Entity>(*this, availableEntityIds.front());
+	availableEntityIds.pop();
 	nEntities++;
 	return entity;
 }
 
-void EntityManager::destroyEntity(Entity entity) {
-	if (entity >= MAX_ENTITIES) throw std::out_of_range("Entity " + std::to_string(entity) + " out of range.");
-	availableEntities.push(entity);
+void EntityManager::destroyEntity(EntityId entity) {
+	availableEntityIds.push(entity);
 	nEntities--;
 }

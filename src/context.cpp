@@ -3,6 +3,7 @@
 #include "ecs/components/camera.hpp"
 #include "ecs/components/light.hpp"
 #include "ecs/components/transform.hpp"
+#include "ecs/entity.hpp"
 #include "ecs/scene.hpp"
 #include "graphics/model.hpp"
 #include "graphics/shader.hpp"
@@ -103,8 +104,8 @@ void Context::loop() {
 	auto mainCameraTransform = std::make_shared<Transform>();
 	auto mainCameraComponent = std::make_shared<Camera>(mainCameraTransform);
 	mainCameraComponent->setMain(true);
-	scene.addComponent(mainCamera, mainCameraTransform);
-	scene.addComponent(mainCamera, mainCameraComponent);
+	mainCamera->addComponent(mainCameraTransform);
+	mainCamera->addComponent(mainCameraComponent);
 
 	input->addKeyCallback(GLFW_KEY_ESCAPE, PRESS, [](auto &ctx) { glfwSetWindowShouldClose(ctx.window, true); });
 	input->addKeyCallback(GLFW_KEY_W, PRESS, [mainCameraComponent, mainCameraTransform](auto &ctx) mutable { mainCameraComponent->move(mainCameraTransform, FORWARD, ctx.time.delta); });
@@ -150,9 +151,9 @@ void Context::loop() {
 	auto backpackModel = loadModel("res/backpack/backpack.obj");
 	Transform backpackTransform;
 	backpackTransform.scale = glm::vec3(0.5f);
-	scene.addComponent(backpack, backpackTransform);
-	scene.addComponent(backpack, backpackModel);
-	scene.addComponent(backpack, globalShader);
+	backpack->addComponent(backpackTransform);
+	backpack->addComponent(backpackModel);
+	backpack->addComponent(globalShader);
 
 	auto directionalLight = scene.createEntity();
 	Transform directionalLightTransform(glm::vec3(0.0f), glm::vec3(-65.0f, -90.0f, 0.0f));
@@ -160,8 +161,8 @@ void Context::loop() {
 	directionalLightComponent.ambient = glm::vec3(0.05f);
 	directionalLightComponent.diffuse = glm::vec3(0.4f);
 	directionalLightComponent.specular = glm::vec3(0.5f);
-	scene.addComponent(directionalLight, directionalLightTransform);
-	scene.addComponent(directionalLight, directionalLightComponent);
+	directionalLight->addComponent(directionalLightTransform);
+	directionalLight->addComponent(directionalLightComponent);
 
 	auto sphereModel = loadModel("res/only_quad_sphere.obj");
 	for (int i = 0; i < 4; i++) {
@@ -169,10 +170,10 @@ void Context::loop() {
 		Transform pointLightTransform(LIGHT_SOURCE_POSITIONS[i]);
 		pointLightTransform.scale = glm::vec3(0.2f);
 		Light pointLightComponent(POINT);
-		scene.addComponent(pointLight, pointLightTransform);
-		scene.addComponent(pointLight, sphereModel);
-		scene.addComponent(pointLight, lightSourceShader);
-		scene.addComponent(pointLight, pointLightComponent);
+		pointLight->addComponent(pointLightTransform);
+		pointLight->addComponent(sphereModel);
+		pointLight->addComponent(lightSourceShader);
+		pointLight->addComponent(pointLightComponent);
 	}
 
 	while (!glfwWindowShouldClose(window)) {
@@ -189,10 +190,10 @@ void Context::loop() {
 
 		// Get lights
 		std::vector<std::pair<std::shared_ptr<Light>, std::shared_ptr<Transform>>> lights;
-		for (auto entity : scene.getActiveEntities()) {
-			auto lightOpt = scene.getComponent<Light>(entity);
+		for (auto [_, entity] : scene.getActiveEntities()) {
+			auto lightOpt = entity->getComponent<Light>();
 			if (lightOpt) {
-				auto transform = scene.getComponent<Transform>(entity).value();
+				auto transform = entity->getComponent<Transform>().value();
 				lights.push_back({lightOpt.value(), transform});
 			}
 		}
@@ -205,12 +206,12 @@ void Context::loop() {
 			100.0f
 		);
 
-		for (auto entity : scene.getActiveEntities()) {
-			auto modelOpt = scene.getComponent<Model>(entity);
+		for (auto [_, entity] : scene.getActiveEntities()) {
+			auto modelOpt = entity->getComponent<Model>();
 			if (modelOpt) {
 				auto model = modelOpt.value();
-				auto transform = scene.getComponent<Transform>(entity).value();
-				auto shader = scene.getComponent<ShaderProgram>(entity).value();
+				auto transform = entity->getComponent<Transform>().value();
+				auto shader = entity->getComponent<ShaderProgram>().value();
 
 				unsigned int nDirectional = 0;
 				unsigned int nPoint = 0;
