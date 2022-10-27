@@ -2,6 +2,8 @@
 
 #include "types.hpp"
 #include <array>
+#include <cstddef>
+#include <iosfwd>
 #include <memory>
 #include <optional>
 #include <stdexcept>

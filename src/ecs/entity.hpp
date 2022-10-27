@@ -3,10 +3,7 @@
 #include "scene.hpp"
 #include "types.hpp"
 #include <memory>
-#include <optional>
 #include <queue>
-
-class Scene;
 
 class Entity {
 	private:
@@ -41,11 +38,16 @@ class Entity {
 
 class EntityManager {
 	private:
+	 	Scene &scene;
 		std::queue<EntityId> availableEntityIds {};
 		unsigned int nEntities = 0;
 
 	public:
-		EntityManager();
+		EntityManager(Scene &scene) : scene(scene) {
+			for (EntityId e = 0; e < MAX_ENTITIES; e++)
+				availableEntityIds.push(e);
+		};
+
 		std::shared_ptr<Entity> createEntity();
 		void destroyEntity(EntityId entityId);
 };

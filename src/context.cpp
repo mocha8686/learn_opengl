@@ -190,7 +190,7 @@ void Context::loop() {
 
 		// Get lights
 		std::vector<std::pair<std::shared_ptr<Light>, std::shared_ptr<Transform>>> lights;
-		for (auto [_, entity] : scene.getActiveEntities()) {
+		for (auto entity : scene.getActiveEntities()) {
 			auto lightOpt = entity->getComponent<Light>();
 			if (lightOpt) {
 				auto transform = entity->getComponent<Transform>().value();
@@ -206,7 +206,7 @@ void Context::loop() {
 			100.0f
 		);
 
-		for (auto [_, entity] : scene.getActiveEntities()) {
+		for (auto entity : scene.getActiveEntities()) {
 			auto modelOpt = entity->getComponent<Model>();
 			if (modelOpt) {
 				auto model = modelOpt.value();
