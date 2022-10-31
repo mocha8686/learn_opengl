@@ -34,6 +34,7 @@ class Mesh {
 		) : ctx(ctx), vertices(vertices), indices(indices), textures(textures) {
 			setupMesh();
 		};
+		~Mesh();
 
 		void draw(std::shared_ptr<ShaderProgram> shader);
 };

@@ -16,12 +16,12 @@ struct aiScene;
 class Model {
 	private:
 		Context &ctx;
-		std::vector<Mesh> meshes;
+		std::vector<std::unique_ptr<Mesh>> meshes;
 		std::string dir;
 
 		void loadModel(const std::string &path);
 		void processNode(aiNode *node, const aiScene *scene);
-		Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+		std::unique_ptr<Mesh> processMesh(aiMesh *mesh, const aiScene *scene);
 		std::vector<std::shared_ptr<Texture>> loadMaterialTextures(aiMaterial *mat, aiTextureType type);
 
 	public:

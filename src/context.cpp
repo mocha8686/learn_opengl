@@ -8,16 +8,13 @@
 #include "graphics/model.hpp"
 #include "graphics/shader.hpp"
 #include "input/input.hpp"
-#include "input/keyboard.hpp"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <cmath>
 #include <optional>
-#include <set>
 #include <stdexcept>
 #include <string>
 #include <tuple>

@@ -1,5 +1,7 @@
 #include "model.hpp"
+
 #include "../context.hpp"
+#include "../util/cache.hpp"
 #include "mesh.hpp"
 #include "texture.hpp"
 
@@ -19,8 +21,8 @@
 #include <string>
 
 void Model::draw(std::shared_ptr<ShaderProgram> shader) {
-	for (unsigned int i = 0; i < meshes.size(); i++) {
-		meshes[i].draw(shader);
+	for (const auto &mesh : meshes) {
+		mesh->draw(shader);
 	}
 }
 
@@ -41,7 +43,7 @@ void Model::loadModel(const std::string &path) {
 void Model::processNode(aiNode *node, const aiScene *scene) {
 	for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 		auto *mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(processMesh(mesh, scene));
+		meshes.push_back(std::move(processMesh(mesh, scene)));
 	}
 
 	for (unsigned int i = 0; i < node->mNumChildren; i++) {
@@ -49,7 +51,7 @@ void Model::processNode(aiNode *node, const aiScene *scene) {
 	}
 }
 
-Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
+std::unique_ptr<Mesh> Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	std::vector<std::shared_ptr<Texture>> textures;
@@ -96,7 +98,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene) {
 		textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 	}
 
-	return Mesh(ctx, vertices, indices, textures);
+	return std::make_unique<Mesh>(ctx, vertices, indices, textures);
 }
 
 std::vector<std::shared_ptr<Texture>> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type) {

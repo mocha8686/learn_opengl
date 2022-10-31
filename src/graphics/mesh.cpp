@@ -4,8 +4,10 @@
 #include "texture.hpp"
 #include <glad/glad.h>
 #include <iosfwd>
+#include <memory>
 #include <stddef.h>
 #include <string>
+#include <type_traits>
 
 const std::string textureTypeToString(TextureType type) {
 	switch (type) {
@@ -14,6 +16,12 @@ const std::string textureTypeToString(TextureType type) {
 		case SPECULAR:
 			return "Specular";
 	}
+}
+
+Mesh::~Mesh() {
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 }
 
 void Mesh::setupMesh() {
